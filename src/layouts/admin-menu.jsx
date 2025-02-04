@@ -18,12 +18,12 @@ import {
   DatabaseOutlined,
   CreditCardOutlined,
   GlobalOutlined,
-  MonitorOutlined,
+  // MonitorOutlined,
   SettingOutlined,
   HomeOutlined,
   SwitcherOutlined,
-  ContainerOutlined,
-  DatabaseFilled,
+  // ContainerOutlined,
+  // DatabaseFilled,
   DeploymentUnitOutlined,
 } from '@ant-design/icons';
 

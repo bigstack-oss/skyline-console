@@ -19,10 +19,10 @@ import {
   GlobalOutlined,
   // ToolOutlined,
   HomeOutlined,
-  DatabaseFilled,
+  // DatabaseFilled,
   AppstoreOutlined,
   SwitcherOutlined,
-  ContainerOutlined,
+  // ContainerOutlined,
 } from '@ant-design/icons';
 
 const renderMenu = (t) => {
