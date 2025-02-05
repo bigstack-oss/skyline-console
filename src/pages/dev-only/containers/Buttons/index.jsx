@@ -35,7 +35,7 @@ export class Buttons extends Component {
 
   renderButtonBlocks(title, type, size) {
     return (
-      <div>
+      <div style={{ marginBottom: '10px' }}>
         <h3>{title}</h3>
         <SkylineButton type={type} size={size}>
           Skyline Button

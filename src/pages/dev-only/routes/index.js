@@ -16,6 +16,7 @@ import BaseLayout from 'layouts/Basic';
 import E404 from 'pages/base/containers/404';
 import Overview from '../containers/Overview';
 import Buttons from '../containers/Buttons';
+import Icons from '../containers/Icons';
 
 const PATH = '/dev-only';
 export default [
@@ -25,6 +26,7 @@ export default [
     routes: [
       { path: `${PATH}/`, component: Overview, exact: true },
       { path: `${PATH}/buttons`, component: Buttons, exact: true },
+      { path: `${PATH}/icons`, component: Icons, exact: true },
       { path: '*', component: E404 },
     ],
   },
