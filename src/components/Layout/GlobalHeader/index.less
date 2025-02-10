@@ -145,11 +145,20 @@
 }
 
 .avatar {
-  width: 30px;
-  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: @avatar-size;
+  height: @avatar-size;
   color: @avatar-color;
-  border: none;
-  box-shadow: 0 2px 20px 0 rgba(0, 0, 0, 9%);
+  background-color: @avatar-background-color;
+  border: 1px solid @avatar-border-color;
+}
+
+.avatar:hover,
+.avatar:focus {
+  color: @avatar-hover-color;
+  border: 1px solid @avatar-hover-border-color;
 }
 
 .domain {
@@ -213,10 +222,17 @@
   float: left;
   width: @layout-header-logo-wrapper-width;
   height: @header-height;
+  margin-left: @layout-header-logo-margin-left;
   line-height: @header-height;
-  text-align: center;
 
   img {
     height: @layout-header-logo-image-height;
+  }
+
+  & > :not(:last-child) {
+    --tw-space-x-reverse: 0;
+
+    margin-right: calc(12px * (1 - var(--tw-space-x-reverse)));
+    margin-left: calc(12px * var(--tw-space-x-reverse));
   }
 }

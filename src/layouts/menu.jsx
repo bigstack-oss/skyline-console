@@ -12,18 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react';
-import {
-  DesktopOutlined,
-  DatabaseOutlined,
-  GlobalOutlined,
-  // ToolOutlined,
-  HomeOutlined,
-  // DatabaseFilled,
-  AppstoreOutlined,
-  SwitcherOutlined,
-  // ContainerOutlined,
-} from '@ant-design/icons';
+import HomepageIcon from 'asset/icon/monochrome/home_02.svg';
+import ComputePageIcon from 'asset/icon/monochrome/monitor.svg';
+import StoragePageIcon from 'asset/icon/monochrome/database.svg';
+import NetworksPageIcon from 'asset/icon/monochrome/networking.svg';
+import FileSharePageIcon from 'asset/icon/monochrome/file.svg';
+import OrchestrationPageIcon from 'asset/icon/monochrome/integration.svg';
 
 const renderMenu = (t) => {
   if (!t) {
@@ -34,7 +28,7 @@ const renderMenu = (t) => {
       path: '/base/overview',
       name: t('Home'),
       key: 'overview',
-      icon: <HomeOutlined />,
+      icon: HomepageIcon,
       level: 0,
       hasBreadcrumb: false,
       hasChildren: false,
@@ -43,7 +37,7 @@ const renderMenu = (t) => {
       path: '/compute',
       name: t('Compute'),
       key: 'compute',
-      icon: <DesktopOutlined />,
+      icon: ComputePageIcon,
       children: [
         {
           path: '/compute/instance',
@@ -159,7 +153,7 @@ const renderMenu = (t) => {
       path: '/storage',
       name: t('Storage'),
       key: 'storage',
-      icon: <DatabaseOutlined />,
+      icon: StoragePageIcon,
       children: [
         {
           path: '/storage/volume',
@@ -244,7 +238,7 @@ const renderMenu = (t) => {
       path: '/network',
       name: t('Network'),
       key: '/network',
-      icon: <GlobalOutlined />,
+      icon: NetworksPageIcon,
       children: [
         {
           path: '/network/networks',
@@ -563,7 +557,7 @@ const renderMenu = (t) => {
       name: t('Share File Storage'),
       key: 'fileStorage',
       endpoints: 'manilav2',
-      icon: <SwitcherOutlined />,
+      icon: FileSharePageIcon,
       children: [
         {
           path: '/share/share',
@@ -646,7 +640,7 @@ const renderMenu = (t) => {
       name: t('Orchestration'),
       key: 'heat',
       endpoints: 'heat',
-      icon: <AppstoreOutlined />,
+      icon: OrchestrationPageIcon,
       children: [
         {
           path: '/heat/stack',

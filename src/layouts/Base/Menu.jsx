@@ -129,7 +129,11 @@ export class LayoutMenu extends Component {
 
   // eslint-disable-next-line no-unused-vars
   renderMenuItemIcon = ({ item, collapsed, isSubMenu }) => {
-    return item.icon;
+    if (item.icon) {
+      return (
+        <img src={item.icon} alt="menu-item-icon" width="16px" height="16px" />
+      );
+    }
   };
 
   renderMenuItem = (item, isSubMenu) => {

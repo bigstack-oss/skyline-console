@@ -1,34 +1,56 @@
+@import 'variables-cube.less';
+
 /* init */
-@blue-1: #0c63fa;
+@white: @gray-0;
+@black: @dark-850;
+@blue-color: @primary-color;
+
+// Color - blue
+// ---
+@blue-1: @primary-color;
 @blue-2: rgba(0, 104, 255, 65%);
 @blue-3: rgba(89, 157, 255, 35%);
 @blue-4: #005ade;
 @blue-5: rgba(25, 128, 255, 10%);
-@blue-6: #e8f2ff;
-@primary-color: @blue-1;
-@info-color: @blue-2;
-@hover-color: @blue-4;
-@heading-color: rgba(0, 0, 0, 65%);
+@blue-6: @primary-0;
+
+@blue-color01: #c7deef;
+@blue-color02: #7eb8dc;
+@blue-color03: #329dce;
+@blue-color04: #3385b0;
+@blue-color05: #326e93;
 
 @green-1: #57e39b;
 @green-2: rgba(87, 227, 155, 65%);
 @green-3: rgba(87, 227, 155, 35%);
-@success-color: @green-1;
+
+@green-color01: #c4e6d4;
+@green-color02: #a2d8bb;
+@green-color03: #1890ff;
+@green-color04: #479e88;
+@green-color05: #3b747a;
 
 @yellow-1: #fedf40;
 @yellow-2: rgba(254, 223, 64, 65%);
 @yellow-3: rgba(254, 223, 64, 35%);
-@warn-color: @yellow-1;
 
-@warn-light-color: #f6b23d;
-@warn-dark-color: #fa8c16;
+@yellow-color01: #ffe1be;
+@yellow-color02: #ffc781;
+@yellow-color03: #f5a623;
+@yellow-color04: #e0992c;
+@yellow-color05: #8d663e;
+@yellow-color06: #faad14;
+@yellow-color07: #fff3dc;
 
 @red-1: #eb354d;
 @red-2: rgba(235, 53, 77, 65%);
 @red-3: rgba(235, 53, 77, 35%);
-@error-color: @red-1;
-@danger-color: #c4233e;
-@danger-color-hover: #f76070;
+
+@red-color01: #fae7e5;
+@red-color02: #ea8573;
+@red-color03: #ca2621;
+@red-color04: #ab2f29;
+@red-color05: #8c3231;
 @red: @red-color03;
 
 @gray-1: #d2d2d2;
@@ -36,22 +58,6 @@
 @gray-3: #fafafa;
 @gray-4: #f0f1f7;
 @gray-5: #f2f3f8;
-
-@dark-text-title: rgba(0, 0, 0, 100%);
-@dark-text-title-second: rgba(0, 0, 0, 85%);
-@color-text-body: rgba(0, 0, 0, 65%);
-@color-text-caption: rgba(0, 0, 0, 45%);
-@color-text-disable: rgba(0, 0, 0, 25%);
-@color-text-default: rgb(29, 33, 41);
-@color-text-title: rgba(0, 0, 0, 85%);
-
-@size-header-1: 38px;
-@size-header-2: 30px;
-@size-header-3: 24px;
-@size-header-4: 16px;
-@size-display: 20px;
-@size-body: 14px;
-@size-caption: 12px;
 
 @dark-color01: #79879c;
 @dark-color02: #6b7b95;
@@ -76,35 +82,27 @@
 @light-color07: #c1c9d1;
 @light-color08: #abb4be;
 
-@green-color01: #c4e6d4;
-@green-color02: #a2d8bb;
-@green-color03: #1890ff;
-@green-color04: #479e88;
-@green-color05: #3b747a;
+@primary-color: @blue-1;
+@info-color: @blue-2;
+@hover-color: @blue-4;
+@heading-color: rgba(0, 0, 0, 65%);
 
-@blue-color01: #c7deef;
-@blue-color02: #7eb8dc;
-@blue-color03: #329dce;
-@blue-color04: #3385b0;
-@blue-color05: #326e93;
+@success-color: @green-1;
+@warn-color: @yellow-1;
+@warn-light-color: #f6b23d;
+@warn-dark-color: #fa8c16;
 
-@red-color01: #fae7e5;
-@red-color02: #ea8573;
-@red-color03: #ca2621;
-@red-color04: #ab2f29;
-@red-color05: #8c3231;
+@error-color: @red-1;
+@danger-color: #c4233e;
+@danger-color-hover: #f76070;
 
-@yellow-color01: #ffe1be;
-@yellow-color02: #ffc781;
-@yellow-color03: #f5a623;
-@yellow-color04: #e0992c;
-@yellow-color05: #8d663e;
-@yellow-color06: #faad14;
-@yellow-color07: #fff3dc;
-
-@white: #fff;
-@black: #000;
-@blue-color: #124191;
+@dark-text-title: rgba(0, 0, 0, 100%);
+@dark-text-title-second: rgba(0, 0, 0, 85%);
+@color-text-body: rgba(0, 0, 0, 65%);
+@color-text-caption: rgba(0, 0, 0, 45%);
+@color-text-disable: rgba(0, 0, 0, 25%);
+@color-text-default: rgb(29, 33, 41);
+@color-text-title: rgba(0, 0, 0, 85%);
 
 /* specific color */
 @dark: @dark-color07;
@@ -177,7 +175,7 @@
 @btn-default-hover-border: @light-color07;
 @btn-default-active-bg: @light-color08;
 @btn-default-active-border: @light-color07;
-@btn-primary-bg: @dark-color07;
+@btn-primary-bg: @primary-500;
 @btn-primary-hover-bg: @dark-color07;
 @btn-control-bg: @dark-color07;
 @btn-control-hover-bg: @dark-color07;
@@ -211,12 +209,24 @@
 @tr-shadow: inset 0 2px 4px 0 rgba(72, 91, 127, 20%);
 @box-shadow-base: 0 0 8px 0 rgba(0, 0, 0, 15%);
 
-/*  font */
+// Font Family
+// ---
 @font-family: system-ui, -apple-system, blinkmacsystemfont, segoe ui, roboto,
   'PingFang SC', 'Microsoft YaHei', 'Alibaba PuHuiTi', 'Dosis', 'Helvetica Neue',
   helvetica, arial, sans-serif;
 @font-family-id: @font-family;
 @font-family-code: 'PT Mono', monaco, menlo, consolas, 'Courier New', monospace;
+
+// Font Size
+// ---
+@size-header-1: 38px;
+@size-header-2: 30px;
+@size-header-3: 24px;
+@size-header-4: 16px;
+@size-display: 20px;
+@size-body: 14px;
+@size-caption: 12px;
+
 @size-small: 12px;
 @size-normal: 14px;
 @size-medium: 16px;
@@ -369,7 +379,6 @@
 
 /* login */
 @login-error: #a43a39;
-
 @money-color: #f50;
 
 :export {
