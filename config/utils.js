@@ -89,6 +89,14 @@ const THEMES = {
       skylineThemeName: 'custom',
     },
   },
+  skyline: {
+    themeFile: 'theme-skyline.js',
+    lessVariablesName: 'styles/variables-skyline',
+    globalVariables: {
+      menuTheme: 'dark',
+      skylineThemeName: 'skyline',
+    },
+  },
 };
 
 const getThemeConfig = () => {

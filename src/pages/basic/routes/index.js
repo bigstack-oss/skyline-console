@@ -62,6 +62,9 @@ const E404 = lazy(() =>
 const InstanceHA = lazy(() =>
   import(/* webpackChunkName: "Inctance-HA" */ 'pages/ha/App')
 );
+const DevOnly = lazy(() =>
+  import(/* webpackChunkName: "Inctance-HA" */ 'pages/dev-only/App')
+);
 const PATH = '/';
 
 export default [
@@ -122,6 +125,10 @@ export default [
       {
         path: `/ha`,
         component: InstanceHA,
+      },
+      {
+        path: `/dev-only`,
+        component: DevOnly,
       },
       { path: '*', component: E404 },
     ],

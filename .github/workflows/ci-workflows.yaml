@@ -1,0 +1,58 @@
+name: CI workflow
+
+on:
+  pull_request:
+    branches: ['master']
+
+jobs:
+  checks:
+    name: Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 12.22.12
+          cache: 'yarn'
+
+      - name: Install Yarn
+        run: npm install -g yarn@1.22.22
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Run ESLint check
+        run: yarn lint
+
+      - name: Run Prettier check
+        run: yarn prettier --check
+
+  builds:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 12.22.12
+          cache: 'yarn'
+
+      - name: Install Yarn
+        run: npm install -g yarn@1.22.22
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Build UI Library
+        run: yarn run build
+
+      - name: Build Web App
+        run: yarn run build:test
