@@ -327,6 +327,21 @@ export class LayoutMenu extends Component {
     );
   }
 
+  renderCopyright() {
+    const { hover, collapsed } = this.state;
+    const showCopyright = !collapsed || hover;
+    return (
+      <div
+        className={
+          showCopyright ? styles.copyright : styles['copyright-collapsed']
+        }
+      >
+        <p className={styles['sidebar-copyright-title']}>CubeCOS</p>
+        <p className={styles['sidebar-copyright-text']}>Copyright©Bigstack</p>
+      </div>
+    );
+  }
+
   render() {
     const { currentRoutes } = this.props;
     const selectedKeys = this.getSelectedKeys(currentRoutes);
@@ -344,6 +359,7 @@ export class LayoutMenu extends Component {
         onMouseLeave={this.onMouseLeave}
       >
         {this.renderMenu(selectedKeys)}
+        {this.renderCopyright()}
         {trigger}
       </div>
     );
