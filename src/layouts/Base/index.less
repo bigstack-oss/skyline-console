@@ -116,6 +116,14 @@
 
     .ant-menu-submenu-title {
       color: @sider-menu-title-color;
+
+      > .ant-menu-submenu-arrow {
+        &::before,
+        &::after {
+          border-style: solid;
+          border-width: 1px 1px 0 0;
+        }
+      }
     }
 
     .ant-menu-item-selected > span > span,

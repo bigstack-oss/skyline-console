@@ -253,7 +253,7 @@ export class LayoutMenu extends Component {
     const newSelectedKeys = this.getSelectedKeysForMenu(selectedKeys);
     return (
       <Menu
-        theme={GLOBAL_VARIABLES.menuTheme}
+        theme="light"
         mode="inline"
         className={collapsed ? styles['menu-collapsed'] : styles.menu}
         defaultSelectedKeys={newSelectedKeys}
