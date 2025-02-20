@@ -13,11 +13,15 @@
 // limitations under the License.
 
 import React from 'react';
-import { Dropdown, Menu, Button, Tooltip } from 'antd';
-import { DownOutlined } from '@ant-design/icons';
 import PropTypes from 'prop-types';
+import { Dropdown, Menu, Tooltip } from 'antd';
 import { generateId } from 'utils/index';
+//
+import CubeMoreActionsButton from 'src/components/cube/CubeButton/CubeMoreActionsButton';
+import CubeBatchButton from 'src/components/cube/CubeButton/CubeBatchButton';
+import CubeMenuItem from 'components/cube/CubeMenu/CubeMenuItem';
 import ActionButton from '../ActionButton';
+//
 import { getActionsByPolicy } from '../Action';
 import styles from './index.less';
 
@@ -46,6 +50,7 @@ TableBatchButtons.prototypes = {
   visibleButtonNumber: PropTypes.number,
 };
 
+// More Action Button
 function DropdownActionButton({
   actions,
   selectedItems,
@@ -65,31 +70,28 @@ function DropdownActionButton({
     newConf.isDanger = !!isDanger;
     if (!selectedItems.length) {
       return (
-        <Menu.Item key={key} disabled style={{ textAlign: 'center' }}>
+        <CubeMenuItem key={key} disabled>
           {name}
-        </Menu.Item>
+        </CubeMenuItem>
       );
     }
     return (
-      <Menu.Item key={key}>
-        <ActionButton
-          {...newConf}
-          buttonType="link"
-          onFinishAction={onFinishAction}
-          containerProps={containerProps}
-          onClickAction={onClickAction}
-          onCancelAction={onCancelAction}
-          buttonClassName={styles['more-action-btn']}
-        />
-      </Menu.Item>
+      <ActionButton
+        {...newConf}
+        key={key}
+        buttonType="link"
+        onFinishAction={onFinishAction}
+        containerProps={containerProps}
+        onClickAction={onClickAction}
+        onCancelAction={onCancelAction}
+        buttonClassName={styles['more-action-btn']}
+      />
     );
   });
   const menu = <Menu>{menuItems}</Menu>;
   return (
     <Dropdown overlay={menu} overlayClassName={styles['table-batch-menu']}>
-      <Button type="primary">
-        {t('More Actions')} {<DownOutlined />}
-      </Button>
+      <CubeMoreActionsButton>{t('More Actions')}</CubeMoreActionsButton>
     </Dropdown>
   );
 }
@@ -126,16 +128,16 @@ export default function TableBatchButtons(props) {
     showedActions = actionList;
   }
   batchButtons = showedActions.map((it) => {
-    const { isDanger = false, buttonType = 'default' } = it;
+    const { isDanger = false } = it;
     if (!selectedItems || selectedItems.length === 0) {
       return (
         <Tooltip
           title={t('Please select {name} first', { name: resourceName })}
           key={`tooltip-${generateId()}`}
         >
-          <Button type={buttonType} disabled danger={isDanger}>
+          <CubeBatchButton disabled danger={isDanger}>
             {it.buttonText || it.title}
-          </Button>
+          </CubeBatchButton>
         </Tooltip>
       );
     }
@@ -143,7 +145,6 @@ export default function TableBatchButtons(props) {
       <ActionButton
         {...updateConf(it, selectedItems)}
         key={`table-batch-action-${generateId()}`}
-        // buttonClassName={styles['table-action']}
         onFinishAction={onFinishAction}
         containerProps={containerProps}
         onClickAction={onClickAction}

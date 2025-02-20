@@ -15,13 +15,18 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import FileSaver from 'file-saver';
-import { DownloadOutlined, CloseOutlined } from '@ant-design/icons';
+import { CloseOutlined } from '@ant-design/icons';
 import { Button, Menu, Dropdown, Progress, Tooltip } from 'antd';
 import { get, isObject, isArray } from 'lodash';
 import { Parser } from 'json2csv';
-import { toLocalTimeFilter } from 'utils/index';
+//
+import DownloadSvgIcon from 'asset/cube/monochrome/download.svg';
+import CubeIconButton from 'components/cube/CubeButton/CubeIconButton';
+import CubeMenuItem from 'components/cube/CubeMenu/CubeMenuItem';
 import Notify from 'components/Notify';
 import Confirm from 'components/Confirm';
+//
+import { toLocalTimeFilter } from 'utils/index';
 import styles from './index.less';
 
 export default class index extends Component {
@@ -313,10 +318,10 @@ export default class index extends Component {
   renderDownloadCurrent() {
     return (
       <Tooltip title={t('Download all data')}>
-        <Button
+        <CubeIconButton
           type="default"
+          icon={DownloadSvgIcon}
           onClick={this.exportCurrentDataAll}
-          icon={<DownloadOutlined />}
         />
       </Tooltip>
     );
@@ -353,18 +358,22 @@ export default class index extends Component {
   renderDownloadAll() {
     const menu = (
       <Menu>
-        <Menu.Item key="current" onClick={this.exportCurrentData}>
+        <CubeMenuItem key="current" onClick={this.exportCurrentData}>
           {t('Download current data')}
-        </Menu.Item>
-        <Menu.Item key="all" onClick={this.downloadAllData}>
+        </CubeMenuItem>
+        <CubeMenuItem key="all" onClick={this.downloadAllData}>
           {t('Download all data')}
-        </Menu.Item>
+        </CubeMenuItem>
       </Menu>
     );
     return (
       <>
         <Dropdown overlay={menu}>
-          <Button type="default" icon={<DownloadOutlined />} />
+          <CubeIconButton
+            type="default"
+            icon={DownloadSvgIcon}
+            onClick={this.exportCurrentDataAll}
+          />
         </Dropdown>
         {this.renderProgress()}
         {this.renderCancelBtn()}

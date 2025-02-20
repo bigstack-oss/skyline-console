@@ -14,12 +14,14 @@
 
 import React, { Component, forwardRef } from 'react';
 import { inject } from 'mobx-react';
-import { Menu, Dropdown, Button, Divider } from 'antd';
-import { DownOutlined } from '@ant-design/icons';
+import { Menu, Dropdown } from 'antd';
 import { isArray, isEqual } from 'lodash';
 import classnames from 'classnames';
-import { getAllowedResults, getAction } from '../Action';
+import ChevronRightSvgIcon from 'asset/cube/monochrome/chevron_right.svg';
+import CubeMoreActionsButton from 'components/cube/CubeButton/CubeMoreActionsButton';
+import ActionMenuItem from '../ActionButton/ActionMenuItem';
 import ActionButton from '../ActionButton';
+import { getAllowedResults, getAction } from '../Action';
 import styles from './index.less';
 
 const { SubMenu } = Menu;
@@ -65,7 +67,6 @@ function DropdownActionButton({
     return null;
   }
   let firstElement = null;
-  let dividerElement = null;
   let moreElement = null;
   if (firstAction) {
     const isAllowed = getIsAllowedValue(alloweds, 0);
@@ -93,11 +94,10 @@ function DropdownActionButton({
   }
 
   let allowedFatherCount = 0;
-  let allowedAll = 0;
-  let actionButton = null;
   if (moreActions.length > 0) {
     const buttonClassName =
       isWide || moreActions.length > 1 ? styles['more-action-btn'] : '';
+
     const menuContent = moreActions.map((it, index) => {
       if (!it.actions) {
         const isAllowed = getIsAllowedValue(alloweds, it.allowedIndex);
@@ -107,37 +107,10 @@ function DropdownActionButton({
           return null;
         }
         allowedFatherCount += 1;
-        allowedAll += 1;
-        actionButton = (
-          <ActionButton
-            {...config}
-            isAllowed={isAllowed}
-            buttonType="link"
-            item={item}
-            onFinishAction={onFinishAction}
-            onCancelAction={onCancelAction}
-            routing={routing}
-            style={{ padding: 0 }}
-            containerProps={containerProps}
-            onClickAction={onClickAction}
-            buttonClassName={buttonClassName}
-          />
-        );
-        return <Menu.Item key={key}>{actionButton}</Menu.Item>;
-      }
-      let allowedCount = 0;
-      const menuItems = it.actions.map((action, actionIndex) => {
-        const isAllowed = getIsAllowedValue(alloweds, action.allowedIndex);
-        const key = action.key || `key-more-${index}-${actionIndex}`;
-        if (isAllowed) {
-          allowedCount += 1;
-          allowedFatherCount += 1;
-          allowedAll += 1;
-        }
-        const config = getActionConf(action.action, item);
+
         return (
-          <Menu.Item key={key}>
-            <ActionButton
+          <div key={key}>
+            <ActionMenuItem
               {...config}
               isAllowed={isAllowed}
               buttonType="link"
@@ -149,16 +122,52 @@ function DropdownActionButton({
               onClickAction={onClickAction}
               buttonClassName={buttonClassName}
             />
-          </Menu.Item>
+          </div>
+        );
+      }
+
+      let allowedCount = 0;
+
+      const menuItems = it.actions.map((action, actionIndex) => {
+        const isAllowed = getIsAllowedValue(alloweds, action.allowedIndex);
+        const key = action.key || `key-more-${index}-${actionIndex}`;
+        if (isAllowed) {
+          allowedCount += 1;
+          allowedFatherCount += 1;
+        }
+        const config = getActionConf(action.action, item);
+        return (
+          <div key={key}>
+            <ActionMenuItem
+              {...config}
+              isAllowed={isAllowed}
+              buttonType="link"
+              item={item}
+              onFinishAction={onFinishAction}
+              onCancelAction={onCancelAction}
+              routing={routing}
+              containerProps={containerProps}
+              onClickAction={onClickAction}
+              buttonClassName={buttonClassName}
+            />
+          </div>
         );
       });
+
       const menuKey = `sub-menu-${index}`;
       return (
         <SubMenu
-          popupClassName={styles['action-sub-menu']}
+          key={menuKey}
           title={it.title}
           disabled={allowedCount === 0}
-          key={menuKey}
+          popupClassName={styles['action-sub-menu']}
+          expandIcon={
+            <ChevronRightSvgIcon
+              width={12}
+              height={12}
+              style={{ marginLeft: '16px' }}
+            />
+          }
         >
           {menuItems}
         </SubMenu>
@@ -167,33 +176,22 @@ function DropdownActionButton({
 
     const menu = <Menu>{menuContent}</Menu>;
 
-    if (firstAction && moreActions.length > 0 && allowedFatherCount > 0) {
-      dividerElement = <Divider type="vertical" />;
-    }
-
-    if (allowedFatherCount === 1 && allowedAll === 1 && actionButton) {
-      const className = isWide ? '' : styles['single-more-action'];
-      moreElement = <span className={className}>{actionButton}</span>;
-    } else if (allowedFatherCount > 0) {
+    if (allowedFatherCount > 0) {
       moreElement = (
-        <Dropdown
-          overlay={menu}
-          // trigger={['click']}
-        >
-          <Button type="link" className={styles['more-action']}>
-            {t('More')} {<DownOutlined />}
-          </Button>
+        <Dropdown overlay={menu}>
+          <CubeMoreActionsButton type="link" variant="in-table">
+            {t('More')}
+          </CubeMoreActionsButton>
         </Dropdown>
       );
     }
   }
 
   return (
-    <>
+    <div className={styles['action-button-container']}>
       {firstElement}
-      {dividerElement}
       {moreElement}
-    </>
+    </div>
   );
 }
 

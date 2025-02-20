@@ -21,8 +21,7 @@ import { isArray, isFunction, isBoolean, isEmpty } from 'lodash';
 //
 import Confirm from 'components/Confirm';
 import Notify from 'components/Notify';
-import CubeCreateButton from 'src/components/cube/CubeButton/CubeCreateButton';
-import CubeBatchButton from 'src/components/cube/CubeButton/CubeBatchButton';
+import CubeMenuItemButton from 'components/cube/CubeButton/CubeMenuItemButton';
 //
 import { firstUpperCase, allSettled } from 'utils';
 import styles from './index.less';
@@ -56,7 +55,7 @@ export const getDefaultMsg = (action, data) => {
   };
 };
 
-export class ActionButton extends Component {
+export class ActionMenuItem extends Component {
   static propTypes() {
     return {
       title: PropTypes.string.isRequired,
@@ -565,7 +564,6 @@ export class ActionButton extends Component {
       id,
       title,
       isDanger,
-      style,
       maxLength,
       isFirstAction,
     } = this.props;
@@ -574,39 +572,23 @@ export class ActionButton extends Component {
     }
     const buttonText = name || title;
 
-    const isCreateButton =
-      name.toLowerCase().includes('create') ||
-      title.toLowerCase().includes('create');
-
     let showTip = false;
     if (isFirstAction && buttonText && buttonText.length > maxLength) {
       showTip = true;
     }
-    const button = isCreateButton ? (
-      <CubeCreateButton
+    const button = (
+      <CubeMenuItemButton
+        key={id}
         type={buttonType}
         danger={isDanger}
         onClick={this.onClick}
-        key={id}
         disabled={!isAllowed}
         className={buttonClassName}
-        style={style}
       >
         {name || title}
-      </CubeCreateButton>
-    ) : (
-      <CubeBatchButton
-        type={buttonType}
-        danger={isDanger}
-        onClick={this.onClick}
-        key={id}
-        disabled={!isAllowed}
-        className={buttonClassName}
-        style={style}
-      >
-        {name || title}
-      </CubeBatchButton>
+      </CubeMenuItemButton>
     );
+
     const buttonRender = showTip ? (
       <Tooltip title={buttonText}>{button}</Tooltip>
     ) : (
@@ -622,4 +604,4 @@ export class ActionButton extends Component {
   }
 }
 
-export default inject('rootStore')(observer(ActionButton));
+export default inject('rootStore')(observer(ActionMenuItem));

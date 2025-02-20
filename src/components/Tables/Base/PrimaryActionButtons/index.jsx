@@ -14,8 +14,8 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { generateId } from 'utils/index';
 import { isEqual } from 'lodash';
+import { generateId } from 'utils/index';
 import ActionButton from '../ActionButton';
 import { getAllowedResults, getAction } from '../Action';
 
