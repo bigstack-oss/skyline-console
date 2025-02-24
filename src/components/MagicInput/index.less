@@ -65,16 +65,16 @@
 
     .ant-input:focus {
       border: none;
+      border-radius: none;
       box-shadow: none;
+    }
+
+    input {
+      border-radius: 0;
     }
 
     input::placeholder {
       font-size: @table-header-search-input-font-size;
-    }
-
-    .ant-menu-vertical > .ant-menu-item {
-      height: 26px;
-      line-height: 26px;
     }
 
     .ant-menu-vertical .ant-menu-item {
@@ -135,10 +135,10 @@
 
 .search-icon {
   position: absolute;
-  top: 0;
+  top: 10;
   right: 8px;
-  color: @color-text-body;
-  font-size: 12px;
+  display: flex;
+  justify-content: center;
   line-height: 32px;
 }
 

@@ -1,0 +1,85 @@
+@import '~styles/variables';
+
+.more-actions-button {
+  color: @functional-text;
+  background-color: @white;
+  border: 1px solid @functional-border-darker;
+
+  &:hover {
+    > img {
+      filter: invert(31%) sepia(84%) saturate(2535%) hue-rotate(223deg)
+        brightness(102%) contrast(95%);
+    }
+  }
+}
+
+.more-actions-button-in-table {
+  margin: 0;
+  padding: 0 8px;
+  background-color: transparent;
+  border: none;
+
+  img {
+    filter: invert(31%) sepia(84%) saturate(2535%) hue-rotate(223deg)
+      brightness(102%) contrast(95%);
+  }
+
+  &:hover {
+    background-color: transparent;
+  }
+}
+
+.create-button {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.icon-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .icon-primary {
+    color: @white;
+  }
+
+  .icon-default {
+    color: @primary-color;
+  }
+
+  &:hover {
+    > .icon-default {
+      filter: brightness(0) saturate(100%) invert(38%) sepia(73%)
+        saturate(1591%) hue-rotate(216deg) brightness(104%) contrast(101%);
+    }
+  }
+}
+
+.cube-menu-item-button {
+  width: 100%;
+  margin: 0;
+  padding: 10px 16px;
+  color: @functional-text;
+  text-align: left;
+  border: none;
+  border-radius: 0;
+  .primary-body4();
+
+  &:hover {
+    color: @functional-text;
+    background-color: @menu-item-hover-background;
+  }
+}
+
+.cube-menu-item-button-disabled,
+.cube-menu-item-button-disabled:hover {
+  width: 100%;
+  margin: 0;
+  padding: 10px 16px;
+  color: @functional-disable;
+  border: 1px solid tomato;
+  border-radius: 0;
+  cursor: default;
+  .primary-body4();
+}

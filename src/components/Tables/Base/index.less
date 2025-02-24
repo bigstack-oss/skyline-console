@@ -61,66 +61,75 @@
   margin-left: 0;
 }
 
+.table-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .table-header {
   display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   justify-content: space-between;
 }
 
 .table-header-btns,
 .table-header-action-btns {
   position: relative;
-  display: inline-block;
-  margin-bottom: calc(@body-padding - 4px);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 
-  :global {
-    button {
-      margin-right: 10px;
-      margin-bottom: 4px;
-    }
+  // :global {
+  //   button {
+  //     margin-right: 10px;
+  //     margin-bottom: 4px;
+  //   }
 
-    .ant-btn[disabled] {
-      box-shadow: 0 2px 0 rgba(0, 0, 0, 4.5%);
-    }
+  //   .ant-btn[disabled] {
+  //     box-shadow: 0 2px 0 rgba(0, 0, 0, 4.5%);
+  //   }
 
-    .ant-btn-default {
-      color: @table-header-default-button-color;
-      background-color: @table-header-default-button-background;
-      border-color: @table-header-default-button-border;
-    }
+  //   .ant-btn-default {
+  //     color: @table-header-default-button-color;
+  //     background-color: @table-header-default-button-background;
+  //     border-color: @table-header-default-button-border;
+  //   }
 
-    .ant-btn-default:hover {
-      color: @primary-color;
-      border-color: @primary-color;
-    }
+  //   .ant-btn-default:hover {
+  //     color: @primary-color;
+  //     border-color: @primary-color;
+  //   }
 
-    .ant-btn-dangerous {
-      color: @table-header-danger-button-color;
-    }
+  //   .ant-btn-dangerous {
+  //     color: @table-header-danger-button-color;
+  //   }
 
-    .ant-btn-dangerous:hover {
-      color: @error-color;
-      border-color: @error-color;
-    }
+  //   .ant-btn-dangerous:hover {
+  //     color: @error-color;
+  //     border-color: @error-color;
+  //   }
 
-    .ant-btn[disabled],
-    .ant-btn[disabled]:hover,
-    .ant-btn[disabled]:focus,
-    .ant-btn[disabled]:active {
-      color: @table-header-disable-button-color !important;
-      background: @table-header-disable-button-background !important;
-      border-color: @table-header-disable-button-border !important;
-    }
-  }
+  //   .ant-btn[disabled],
+  //   .ant-btn[disabled]:hover,
+  //   .ant-btn[disabled]:focus,
+  //   .ant-btn[disabled]:active {
+  //     color: @table-header-disable-button-color !important;
+  //     background: @table-header-disable-button-background !important;
+  //     border-color: @table-header-disable-button-border !important;
+  //   }
+  // }
 }
 
 .search-row {
   min-width: 350px;
 }
 
-.search-input {
-  width: 288px;
-  height: 32px;
-}
+// .search-input {
+//   width: 200px;
+//   height: 32px;
+// }
 
 // .table-header-action-btns {
 //   flex-grow: 0;
@@ -129,15 +138,17 @@
 
 .table-header-right {
   display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
-.table-header-btns {
-  margin-right: 0;
-  margin-left: 10px;
+// .table-header-btns {
+//   margin-right: 0;
+//   // margin-left: 10px;
 
-  :global {
-    button:last-child {
-      margin-right: 0;
-    }
-  }
-}
+//   :global {
+//     button:last-child {
+//       margin-right: 0;
+//     }
+//   }
+// }

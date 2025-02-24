@@ -13,13 +13,17 @@
 // limitations under the License.
 
 import React, { Component } from 'react';
-import { inject, observer } from 'mobx-react';
-import { Modal, Button, Tooltip } from 'antd';
-import { isArray, isFunction, isBoolean, isEmpty } from 'lodash';
-import Confirm from 'components/Confirm';
 import PropTypes from 'prop-types';
-import Notify from 'components/Notify';
 import classnames from 'classnames';
+import { inject, observer } from 'mobx-react';
+import { Modal, Tooltip } from 'antd';
+import { isArray, isFunction, isBoolean, isEmpty } from 'lodash';
+//
+import Confirm from 'components/Confirm';
+import Notify from 'components/Notify';
+import CubeCreateButton from 'src/components/cube/CubeButton/CubeCreateButton';
+import CubeBatchButton from 'src/components/cube/CubeButton/CubeBatchButton';
+//
 import { firstUpperCase, allSettled } from 'utils';
 import styles from './index.less';
 
@@ -569,12 +573,17 @@ export class ActionButton extends Component {
       return null;
     }
     const buttonText = name || title;
+
+    const isCreateButton =
+      name.toLowerCase().includes('create') ||
+      title.toLowerCase().includes('create');
+
     let showTip = false;
     if (isFirstAction && buttonText && buttonText.length > maxLength) {
       showTip = true;
     }
-    const button = (
-      <Button
+    const button = isCreateButton ? (
+      <CubeCreateButton
         type={buttonType}
         danger={isDanger}
         onClick={this.onClick}
@@ -584,7 +593,19 @@ export class ActionButton extends Component {
         style={style}
       >
         {name || title}
-      </Button>
+      </CubeCreateButton>
+    ) : (
+      <CubeBatchButton
+        type={buttonType}
+        danger={isDanger}
+        onClick={this.onClick}
+        key={id}
+        disabled={!isAllowed}
+        className={buttonClassName}
+        style={style}
+      >
+        {name || title}
+      </CubeBatchButton>
     );
     const buttonRender = showTip ? (
       <Tooltip title={buttonText}>{button}</Tooltip>

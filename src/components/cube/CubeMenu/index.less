@@ -1,0 +1,23 @@
+@import '~styles/variables';
+
+.cube-menu-item {
+  margin: 0;
+  padding: 10px 16px;
+  color: @functional-text;
+  .primary-body4();
+
+  &:hover {
+    color: @functional-text;
+    background-color: @menu-item-hover-background;
+    cursor: pointer;
+  }
+}
+
+.cube-menu-item-disabled {
+  margin: 0;
+  padding: 10px 16px;
+  color: @functional-disable;
+  .primary-body4();
+
+  cursor: default;
+}
