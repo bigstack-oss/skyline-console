@@ -187,11 +187,6 @@
   }
 }
 
-.content {
-  height: calc(100vh - @header-height);
-  background-color: @background-color;
-}
-
 .sub-menu {
   font-size: 10px;
 
@@ -252,8 +247,8 @@
 }
 
 .main {
-  height: calc(100vh - @header-height - @breadcrumb-height);
-  overflow: hidden;
+  height: auto;
+  overflow-y: auto;
 }
 
 .main-no-breadcrumb {
@@ -356,6 +351,8 @@
   right: 0;
   left: @sider-width;
   height: calc(100vh - @header-height);
+  overflow-y: auto;
+  background-color: @background-color;
 }
 
 .base-layout-right-collapsed {
@@ -441,6 +438,7 @@
     margin: 0;
     padding: 3px 0;
     .primary-body5();
+
     color: @functional-text;
   }
 

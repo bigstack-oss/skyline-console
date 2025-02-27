@@ -13,14 +13,16 @@
 // limitations under the License.
 
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import classnames from 'classnames';
 import { inject, observer } from 'mobx-react';
 import { Modal, Button, Tooltip } from 'antd';
 import { isArray, isFunction, isBoolean, isEmpty } from 'lodash';
-import Confirm from 'components/Confirm';
-import PropTypes from 'prop-types';
-import Notify from 'components/Notify';
-import classnames from 'classnames';
 import { firstUpperCase, allSettled } from 'utils';
+import CancelSvgIcon from 'asset/cube/monochrome/x.svg';
+import CubeCreateButton from 'components/cube/CubeButton/CubeCreateButton';
+import Notify from 'components/Notify';
+import Confirm from 'components/Confirm';
 import styles from './index.less';
 
 export const getDefaultMsg = (action, data) => {
@@ -75,6 +77,7 @@ export class ActionButton extends Component {
       isFirstAction: PropTypes.bool,
       onClickAction: PropTypes.func,
       visible: PropTypes.bool,
+      isCreateIcon: PropTypes.bool,
     };
   }
 
@@ -94,6 +97,7 @@ export class ActionButton extends Component {
     isFirstAction: false,
     onClickAction: null,
     visible: false,
+    isCreateIcon: false,
   };
 
   constructor(props) {
@@ -536,7 +540,10 @@ export class ActionButton extends Component {
       modalProps.cancelButtonProps = cancelButtonProps;
     }
     return (
-      <Modal {...modalProps}>
+      <Modal
+        {...modalProps}
+        closeIcon={<CancelSvgIcon width={16} height={16} />}
+      >
         <ActionComponent
           item={item}
           items={items}
@@ -564,16 +571,33 @@ export class ActionButton extends Component {
       style,
       maxLength,
       isFirstAction,
+      isCreateIcon,
     } = this.props;
+
     if (!isAllowed && needHide) {
       return null;
     }
     const buttonText = name || title;
+
     let showTip = false;
+
     if (isFirstAction && buttonText && buttonText.length > maxLength) {
       showTip = true;
     }
-    const button = (
+
+    const button = isCreateIcon ? (
+      <CubeCreateButton
+        type={buttonType}
+        danger={isDanger}
+        onClick={this.onClick}
+        key={id}
+        disabled={!isAllowed}
+        className={buttonClassName}
+        style={style}
+      >
+        {buttonText}
+      </CubeCreateButton>
+    ) : (
       <Button
         type={buttonType}
         danger={isDanger}
@@ -583,9 +607,10 @@ export class ActionButton extends Component {
         className={buttonClassName}
         style={style}
       >
-        {name || title}
+        {buttonText}
       </Button>
     );
+
     const buttonRender = showTip ? (
       <Tooltip title={buttonText}>{button}</Tooltip>
     ) : (
