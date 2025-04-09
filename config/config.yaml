@@ -10,5 +10,6 @@ globalVariables:
   supportLanguages: # use value in i18n.js
     - en
     - zh-hans
+    - zh-hant
     - ko-kr
     - ru
