@@ -42,6 +42,17 @@ export class Login extends Component {
     this.getDomains();
     this.getRegions();
     this.getSSO();
+    /**
+     * Set initial loginType state and sync it with the form
+     */
+    if (this.enableSSO && this.SSOOptions.length > 0) {
+      const ssoOption = this.SSOOptions[0];
+      this.setState({ loginTypeOption: ssoOption }, () => {
+        this.formRef.current?.setFieldsValue({
+          loginType: ssoOption.value,
+        });
+      });
+    }
   }
 
   async getDomains() {
@@ -56,7 +67,14 @@ export class Login extends Component {
 
   async getSSO() {
     try {
-      this.store.fetchSSO();
+      /**
+       * After getSSO() completes,
+       * set the first one as the default option if there are SSO options.
+       */
+      await this.store.fetchSSO();
+      if (this.enableSSO && this.SSOOptions.length > 0) {
+        this.setState({ loginTypeOption: this.SSOOptions[0] });
+      }
     } catch (e) {
       console.log(e);
     }
@@ -145,6 +163,9 @@ export class Login extends Component {
     return [this.passwordOption, ...this.SSOOptions];
   }
 
+  /**
+   * When user selects a login type, update state to reflect current selection
+   */
   onLoginTypeChange = (value, option) => {
     this.setState({ loginTypeOption: option });
   };
@@ -162,10 +183,21 @@ export class Login extends Component {
     return value;
   }
 
+  /**
+   * Construct default form values based on available options and the selected login type.
+   */
   get defaultValue() {
+    const { loginTypeOption } = this.state;
     const data = {
-      loginType: 'password',
+      /**
+       * Set the login type based on the current state (SSO or password).
+       */
+      loginType: loginTypeOption?.value || 'password',
     };
+
+    /**
+     * Auto-fill region and domain if there's only one available
+     */
     if (this.regions.length === 1) {
       data.region = this.regions[0].value;
     }
@@ -176,7 +208,7 @@ export class Login extends Component {
   }
 
   get formItems() {
-    const { error, loading } = this.state;
+    const { error, loading, loginTypeOption } = this.state;
     // eslint-disable-next-line no-unused-vars
     const buttonProps = {
       block: true,
@@ -269,6 +301,7 @@ export class Login extends Component {
         <CubeSelect
           placeholder={t('Select a login type')}
           options={this.loginTypeOptions}
+          value={loginTypeOption?.value}
           onChange={this.onLoginTypeChange}
         />
       ),
@@ -370,11 +403,13 @@ export class Login extends Component {
     this.rootStore.routing.push('/auth/change-password');
   };
 
+  /**
+   * This method resets the form fields back to their initial values.
+   * It safely checks if the form reference and the resetFields function exist
+   * before calling it, using optional chaining for brevity and safety.
+   */
   updateDefaultValue = () => {
-    this.formRef.current.resetFields();
-    if (this.formRef.current && this.formRef.current.resetFields) {
-      this.formRef.current.resetFields();
-    }
+    this.formRef.current?.resetFields();
   };
 
   init() {
@@ -389,6 +424,7 @@ export class Login extends Component {
   renderFooter() {
     return (
       <div className={styles.footer}>
+        {/* eslint-disable-next-line spellcheck/spell-checker */}
         <p className={styles.copyright}>Copyright©Bigstack</p>
         <a href="/" className={styles.terms}>
           Terms & Policy
