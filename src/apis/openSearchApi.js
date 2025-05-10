@@ -13,12 +13,12 @@ const composeUrl = async (path) => {
     throw new Error('Data center name is empty');
   }
 
-  return `/datacenters/${dataCenter.name}/grafana${path}`;
+  return `/datacenters/${dataCenter.name}/opensearch${path}`;
 };
 
-export const grafanaApi = {
-  getInstanceLink: async (instanceId) => {
-    const url = await composeUrl(`/instances/${instanceId}`);
+export const openSearchApi = {
+  getRequestLink: async (requestId) => {
+    const url = await composeUrl(`/requests/${requestId}`);
     const response = await cosApiClientV1.get(url);
     return response.data.data.link;
   },

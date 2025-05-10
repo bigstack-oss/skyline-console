@@ -1765,6 +1765,7 @@
   "Only subnets that are already connected to the router can be selected.": "Можно выбирать только подсети, которые уже подключены к маршрутизатору.",
   "Open External Gateway": "Открыть внешний шлюз",
   "OpenID Connect": "OpenID Connect",
+  "OpenSearch": "OpenSearch",
   "OpenStack Services": "Сервисы OpenStack",
   "Operating Status": "Состояние работы",
   "Operating System": "операционную систему",

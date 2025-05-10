@@ -1765,6 +1765,7 @@
   "Only subnets that are already connected to the router can be selected.": "仅可选择已经连接过路由器的子网。",
   "Open External Gateway": "开启公网网关",
   "OpenID Connect": "OpenID连接",
+  "OpenSearch": "OpenSearch",
   "OpenStack Services": "OpenStack服务",
   "Operating Status": "操作状态",
   "Operating System": "操作系统",
