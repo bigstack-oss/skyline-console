@@ -905,6 +905,9 @@ export default class BaseList extends React.Component {
   getDataSource = () => {
     const { data, filters = {} } = this.list;
     const { timeFilter = {} } = this.state;
+    // Destruct fields such as `tab` and `tabs` because those properties are only used
+    // by the frontend, and will lead to 400 Bad Request error when making API requests
+    // because they are unrecognized by the API server.
     const { id, tab, ...rest } = filters;
     const newFilters = rest;
     let items = [];

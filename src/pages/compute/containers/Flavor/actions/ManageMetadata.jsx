@@ -66,12 +66,12 @@ export class ManageMetadata extends ModalAction {
     this.updateDefaultValue();
   }
 
-  get metadata() {
+  get systemMetadata() {
     return this.metadataStore.list.data || [];
   }
 
   checkKeyInSystem = (key) => {
-    const metadata = this.metadata.find((it) => {
+    const metadata = this.systemMetadata.find((it) => {
       const { detail: { properties = {} } = {} } = it;
       return Object.keys(properties).indexOf(key) >= 0;
     });
@@ -86,19 +86,17 @@ export class ManageMetadata extends ModalAction {
   parseExistMetadata() {
     const customs = [];
     const systems = {};
-    if (this.metadata.length > 0) {
-      const metadata = this.getItemMetadata();
-      Object.keys(metadata).forEach((key) => {
-        if (this.checkKeyInSystem(key)) {
-          systems[key] = metadata[key];
-        } else {
-          customs.push({
-            index: customs.length,
-            value: { key, value: metadata[key] },
-          });
-        }
-      });
-    }
+    const metadata = this.getItemMetadata();
+    Object.keys(metadata).forEach((key) => {
+      if (this.checkKeyInSystem(key)) {
+        systems[key] = metadata[key];
+      } else {
+        customs.push({
+          index: customs.length,
+          value: { key, value: metadata[key] },
+        });
+      }
+    });
     return {
       customs,
       systems,
@@ -145,7 +143,7 @@ export class ManageMetadata extends ModalAction {
         label: t('Custom Metadata'),
         type: 'add-select',
         itemComponent: KeyValueInput,
-        addText: t('Add Custom Metadata'),
+        addText: t('Custom Metadata'),
         validator: (rule, value) => {
           if (!this.checkCustoms(value)) {
             // eslint-disable-next-line prefer-promise-reject-errors
@@ -156,9 +154,9 @@ export class ManageMetadata extends ModalAction {
       },
       {
         name: 'systems',
-        label: t('Metadata'),
+        label: t('System Metadata'),
         type: 'metadata-transfer',
-        metadata: this.metadata,
+        metadata: this.systemMetadata,
         validator: (rule, value) => {
           if (this.hasNoValue(value)) {
             // eslint-disable-next-line prefer-promise-reject-errors
