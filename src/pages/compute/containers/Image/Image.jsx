@@ -16,22 +16,13 @@ import React from 'react';
 import { observer, inject } from 'mobx-react';
 import ImageType from 'components/ImageType';
 import Base from 'containers/List';
-import {
-  imageStatus,
-  imageVisibility,
-  imageUsage,
-  imageFormats,
-  transitionStatusList,
-  imageContainerFormats,
-} from 'resources/glance/image';
-import { ImageStore } from 'stores/glance/image';
-import { getOptions } from 'utils/index';
+import cosImageStore from 'src/stores/cos/image';
 import actionConfigs from './actions';
 
 export class Image extends Base {
   init() {
-    this.store = new ImageStore();
-    this.downloadStore = new ImageStore();
+    this.store = cosImageStore;
+    this.downloadStore = cosImageStore;
   }
 
   get policy() {
@@ -48,10 +39,6 @@ export class Image extends Base {
       : actionConfigs.actionConfigs;
   }
 
-  get transitionStatusList() {
-    return transitionStatusList;
-  }
-
   get isFilterByBackend() {
     return false;
   }
@@ -61,7 +48,7 @@ export class Image extends Base {
   }
 
   get defaultSortKey() {
-    return 'created_at';
+    return 'createdAt';
   }
 
   get hasTab() {
@@ -123,93 +110,54 @@ export class Image extends Base {
         title: t('ID/Name'),
         dataIndex: 'name',
         routeName: this.getRouteName('imageDetail'),
+        sorter: false,
       },
       {
         title: t('Project ID/Name'),
-        dataIndex: 'project_name',
+        dataIndex: 'project',
         hidden: !this.isAdminPage && this.tab !== 'all',
         sorter: false,
       },
       {
-        title: t('Description'),
-        dataIndex: 'description',
-        isHideable: true,
-        sorter: false,
-      },
-      {
-        title: t('Use Type'),
-        dataIndex: 'usage_type',
-        isHideable: true,
-        valueMap: imageUsage,
-        sorter: false,
-      },
-      {
-        title: t('Container Format'),
-        dataIndex: 'container_format',
-        valueMap: imageContainerFormats,
-        isHideable: true,
-      },
-      {
         title: t('Type'),
-        dataIndex: 'os_distro',
-        isHideable: true,
+        dataIndex: 'os',
         render: (value) => <ImageType type={value} title={value} />,
         width: 80,
         sorter: false,
       },
       {
-        title: t('Status'),
-        dataIndex: 'status',
-        valueMap: imageStatus,
+        title: 'Destination',
+        dataIndex: 'destination',
+        sorter: false,
       },
       {
         title: t('Visibility'),
         dataIndex: 'visibility',
-        valueMap: imageVisibility,
         sorter: false,
       },
       {
-        title: t('Disk Format'),
-        dataIndex: 'disk_format',
-        isHideable: true,
-        valueMap: imageFormats,
-      },
-      {
         title: t('Size'),
-        dataIndex: 'size',
-        isHideable: true,
+        dataIndex: 'sizeMiB',
         valueRender: 'formatSize',
+        sorter: false,
       },
       {
         title: t('Created At'),
-        dataIndex: 'created_at',
-        isHideable: true,
+        dataIndex: 'createdAt',
         valueRender: 'sinceTime',
+      },
+      {
+        title: t('Status'),
+        dataIndex: 'status',
+        isStatus: false,
+        sorter: false,
+        render: ({ current }) => <div>{current}</div>,
       },
     ];
   }
 
   get searchFilters() {
-    const filters = [
-      {
-        label: t('Name'),
-        name: 'name',
-      },
-      {
-        label: t('Status'),
-        name: 'status',
-        options: getOptions(imageStatus),
-      },
-    ];
-    const values = ['public', 'shared'];
-    if (values.indexOf(this.tab) < 0) {
-      filters.push({
-        label: t('Visibility'),
-        name: 'visibility',
-        options: getOptions(imageVisibility),
-      });
-    }
-    return filters;
+    return [{ label: t('Name'), name: 'name' }];
   }
 }
 
