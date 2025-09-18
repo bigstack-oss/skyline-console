@@ -66,10 +66,12 @@ export class CosImageStore extends BaseStore {
           imageOS: cosImage.os,
           imageDomain: cosImage.domain,
           imageDestination: cosImage.destination,
+          imageDiskType: cosImage.diskType,
           imageVisibility: cosImage.visibility,
           imageSize: cosImage.sizeMiB,
           imageCreatedAt: cosImage.createdAt,
           imageStatus: cosImage.status || '',
+          imageMetadata: cosImage.metadata || {},
         };
 
         return {
@@ -212,16 +214,13 @@ export class CosImageStore extends BaseStore {
       console.error(error);
     }
 
-    // Final mapping & sorting
     // Sort the list so that items still in processing appear first
-    finalData = finalData
-      .map((item) => this.mapper(item))
-      .sort((a, b) => {
-        const aProcessing = a.imageStatus?.isProcessing ? 1 : 0;
-        const bProcessing = b.imageStatus?.isProcessing ? 1 : 0;
+    finalData = finalData.sort((a, b) => {
+      const aProcessing = a.imageStatus?.isProcessing ? 1 : 0;
+      const bProcessing = b.imageStatus?.isProcessing ? 1 : 0;
 
-        return bProcessing - aProcessing;
-      });
+      return bProcessing - aProcessing;
+    });
 
     this.list.update({
       data: finalData,
@@ -265,6 +264,38 @@ export class CosImageStore extends BaseStore {
       this.error = error;
     } finally {
       this.isImageCreating = false;
+    }
+  }
+
+  @action
+  async fetchDetail(params = {}) {
+    const { id, silent } = params;
+
+    if (!silent) {
+      this.isLoading = true;
+    }
+
+    try {
+      // If the list is empty, fetch it first
+      let items = this.list.data;
+      if (!items || items.length === 0) {
+        items = await this.fetchList();
+      }
+
+      const item = items.find((it) => it.id === id || it.imageId === id);
+
+      if (item) {
+        this.detail = item;
+      } else {
+        // If not found, clear detail and optionally throw error
+        this.detail = {};
+        throw new Error(`Image with id ${id} not found`);
+      }
+    } catch (error) {
+      console.error('Error fetching image detail:', error);
+      this.detail = {};
+    } finally {
+      this.isLoading = false;
     }
   }
 }
