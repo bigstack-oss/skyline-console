@@ -457,6 +457,7 @@ export const actionMap = {
   extend_volume: t('Extend Volume'),
   changePassword: t('Change Password'),
   rebuild: t('Rebuild'),
+  resetState: t('Reset State'),
   migrate: t('Migrate'),
   'live-migration': t('Live Migrate'),
   delete: t('Delete'),

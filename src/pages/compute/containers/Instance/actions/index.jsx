@@ -49,6 +49,7 @@ import ConfirmResize from './ConfirmResize';
 import RevertResize from './RevertResize';
 import ModifyTags from './ModifyTags';
 import { Monitor } from './Monitor';
+import { ResetState } from './ResetState';
 
 const statusActions = [
   StartAction,
@@ -91,9 +92,17 @@ const batchActions = [
   SoftDelete,
 ];
 
-const batchActionsForIronic = batchActions.slice(0, -2).concat(DeleteIronic);
+const batchActionsForIronic = batchActions.slice(0, 3).concat(DeleteIronic);
 
-const batchActionsForOthers = batchActions.slice(0, -1);
+const batchActionsForOthers = batchActions.slice(0, 4);
+
+const adminBatchActions = [...batchActions, ResetState];
+
+const adminBatchActionsForIronic = adminBatchActions
+  .slice(0, 3)
+  .concat(DeleteIronic);
+
+const adminBatchActionsForOthers = adminBatchActions.slice(0, 4);
 
 const actionConfigs = {
   rowActions: {
@@ -126,6 +135,9 @@ const actionConfigs = {
         action: Edit,
       },
       {
+        action: ResetState,
+      },
+      {
         action: SoftDelete,
       },
       {
@@ -156,6 +168,9 @@ const adminActions = {
         action: LiveMigrate,
       },
       {
+        action: ResetState,
+      },
+      {
         action: SoftDelete,
       },
       {
@@ -166,7 +181,7 @@ const adminActions = {
       },
     ],
   },
-  batchActions,
+  batchActions: adminBatchActions,
   primaryActions: [],
 };
 
@@ -176,4 +191,7 @@ export default {
   batchActions,
   batchActionsForIronic,
   batchActionsForOthers,
+  adminBatchActions,
+  adminBatchActionsForIronic,
+  adminBatchActionsForOthers,
 };
