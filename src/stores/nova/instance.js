@@ -369,6 +369,16 @@ export class ServerStore extends Base {
   }
 
   @action
+  async resetState({ id, state = 'active' }) {
+    const body = {
+      'os-resetState': {
+        state,
+      },
+    };
+    return this.operation({ body, id });
+  }
+
+  @action
   async changePassword({ id, password }) {
     const body = {
       changePassword: {

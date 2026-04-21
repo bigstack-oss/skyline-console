@@ -118,13 +118,22 @@ export class Instance extends Base {
     });
     const allIronic = selectedRows.every((it) => isIronicInstance(it));
     const noIronic = selectedRows.every((it) => !isIronicInstance(it));
+
+    const { hasAdminRole } = this;
+
     if (allIronic) {
-      return actionConfigs.batchActionsForIronic;
+      return hasAdminRole
+        ? actionConfigs.adminBatchActionsForIronic
+        : actionConfigs.batchActionsForIronic;
     }
     if (noIronic) {
-      return actionConfigs.batchActions;
+      return hasAdminRole
+        ? actionConfigs.adminBatchActions
+        : actionConfigs.batchActions;
     }
-    return actionConfigs.batchActionsForOthers;
+    return hasAdminRole
+      ? actionConfigs.adminBatchActionsForOthers
+      : actionConfigs.batchActionsForOthers;
   }
 
   getCheckboxProps(record) {
