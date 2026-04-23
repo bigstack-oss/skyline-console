@@ -13,13 +13,17 @@
 // limitations under the License.
 
 import { inject, observer } from 'mobx-react';
-import Base from 'containers/TabDetail';
 import { QoSPolicyStore } from 'stores/neutron/qos-policy';
-import FloatingIp from 'pages/network/containers/FloatingIp';
+import Base from 'containers/TabDetail';
 import BaseDetail from './BaseDetail';
 import actionConfigs from '../actions';
+import '../qos-policy-list.less';
 
 export class QoSPolicyDetail extends Base {
+  get firstActionClassName() {
+    return 'qos-policy-wide-first-action';
+  }
+
   get name() {
     return t('qoS policy');
   }
@@ -65,11 +69,6 @@ export class QoSPolicyDetail extends Base {
         valueRender: 'yesNo',
       },
       {
-        title: t('Default Policy'),
-        dataIndex: 'is_default',
-        valueRender: 'yesNo',
-      },
-      {
         title: t('Description'),
         dataIndex: 'description',
       },
@@ -89,11 +88,6 @@ export class QoSPolicyDetail extends Base {
         title: t('Detail'),
         key: 'detail',
         component: BaseDetail,
-      },
-      {
-        title: t('Floating IPs'),
-        key: 'fip',
-        component: FloatingIp,
       },
     ];
     return tabs;

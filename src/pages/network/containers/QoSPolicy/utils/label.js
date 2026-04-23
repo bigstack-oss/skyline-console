@@ -3,7 +3,7 @@ import {
   RULE_TYPE_DSCP_MARKING,
   RULE_DIRECTION_INGRESS,
   RULE_DIRECTION_EGRESS,
-} from './ruleUtils';
+} from './const';
 
 /**
  * Get the label of the rule type
@@ -27,15 +27,26 @@ export const getRuleDirectionLabel = (ruleDirection) => {
   return '-';
 };
 
+export const getBandwidthLimitOptions = (rule) => {
+  if (rule.type === RULE_TYPE_BANDWIDTH_LIMIT) {
+    const limitInMbps = rule?.max_kbps ? rule.max_kbps / 1024 : '-';
+    const burstInMbps = rule?.max_burst_kbps ? rule.max_burst_kbps / 1024 : '-';
+    return {
+      limitInMbps,
+      burstInMbps,
+    };
+  }
+  return {};
+};
+
 /**
  * Get the label of the rule detail
  * @param {*} rule
  * @returns string
  */
-export const getRuleDetailLabel = (rule) => {
+export const getRuleDetail = (rule) => {
   if (rule.type === RULE_TYPE_BANDWIDTH_LIMIT) {
-    const limitInMbps = rule.max_kbps / 1024;
-    const burstInMbps = rule.max_burst_kbps / 1024;
+    const { limitInMbps, burstInMbps } = getBandwidthLimitOptions(rule);
     return `Max ${limitInMbps} Mbps, Burst ${burstInMbps} Mbps`;
   }
   if (rule.type === RULE_TYPE_DSCP_MARKING) {
@@ -52,7 +63,7 @@ export const getRuleDetailLabel = (rule) => {
 export const getRuleSummary = (rule) => {
   const type = getRuleTypeLabel(rule.type);
   const direction = getRuleDirectionLabel(rule.direction);
-  const detail = getRuleDetailLabel(rule);
+  const detail = getRuleDetail(rule);
 
   if (direction === '-') return `${type}: ${detail}`;
   return `${type} (${direction}): ${detail}`;

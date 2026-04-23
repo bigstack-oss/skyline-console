@@ -15,7 +15,7 @@
 import React from 'react';
 import { merge } from 'lodash';
 import { yesNoOptions } from 'utils/constants';
-import { getRuleSummary } from 'pages/network/containers/QoSPolicy/actions/utils';
+import { getRuleSummary } from 'pages/network/containers/QoSPolicy/utils/label';
 
 const renderRulesColumn = (rules) => {
   if (!rules?.length) {

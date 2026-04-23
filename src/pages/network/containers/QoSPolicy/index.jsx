@@ -13,8 +13,8 @@
 // limitations under the License.
 
 import { observer, inject } from 'mobx-react';
-import Base from 'containers/TabList';
 import { qosEndpoint } from 'client/client/constants';
+import Base from 'containers/TabList';
 import QoSPolicyComponent from './QoSPolicy';
 
 export class QoSPolicy extends Base {

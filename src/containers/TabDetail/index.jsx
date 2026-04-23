@@ -131,6 +131,10 @@ export default class DetailBase extends React.Component {
     return [];
   }
 
+  get firstActionClassName() {
+    return undefined;
+  }
+
   onCollapsedCallback = () => {};
 
   handleChangeTab = (tab) => {
@@ -359,6 +363,7 @@ export default class DetailBase extends React.Component {
         isAdminPage={this.isAdminPage}
         onClickAction={this.onClickAction}
         onCancelAction={this.onCancelAction}
+        firstActionClassName={this.firstActionClassName}
       />
     );
   }
