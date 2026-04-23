@@ -16,12 +16,14 @@ import React from 'react';
 import { inject, observer } from 'mobx-react';
 import { ModalAction } from 'containers/Action';
 import globalQoSPolicyStore from 'stores/neutron/qos-policy';
-import dscpMarkingItems from './DSCPMarkingItems';
+import { dscpMarkingItems } from './ruleUtils';
 
 export class EditDSCPMarkingRule extends ModalAction {
   static id = 'edit_DSCP_marking_rule';
 
   static title = t('Edit DSCP Marking Rule');
+
+  static buttonText = 'DSCP Marking';
 
   static policy = 'update_policy_dscp_marking_rule';
 

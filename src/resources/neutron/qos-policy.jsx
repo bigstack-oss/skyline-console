@@ -13,21 +13,21 @@
 // limitations under the License.
 
 import React from 'react';
-import { Col, Row } from 'antd';
 import { merge } from 'lodash';
 import { yesNoOptions } from 'utils/constants';
+import { getRuleSummary } from 'pages/network/containers/QoSPolicy/actions/utils';
 
-const getRuleValue = (rule) => {
-  if (rule.direction === 'egress') {
-    return `${t('Egress')}: ${t('Max BandWidth')}: ${
-      rule.max_kbps / 1024
-    } Mbps; ${t('Max Burst')}: ${rule.max_burst_kbps / 1024} Mbps`;
+const renderRulesColumn = (rules) => {
+  if (!rules?.length) {
+    return '-';
   }
-  return rule.direction === 'ingress'
-    ? `${t('Ingress')}: ${t('Max BandWidth')}: ${
-        rule.max_kbps / 1024
-      } Mbps; ${t('Max Burst')}: ${rule.max_burst_kbps / 1024} Mbps`
-    : `${t('DSCP Marking')}: ${rule.dscp_mark}`;
+  return (
+    <ul style={{ margin: 0, paddingLeft: 20 }}>
+      {rules.map((rule, index) => (
+        <li key={rule?.id ?? index}>{getRuleSummary(rule)}</li>
+      ))}
+    </ul>
+  );
 };
 
 export const getQosPolicyColumns = ({ self, all = false }) => {
@@ -43,51 +43,17 @@ export const getQosPolicyColumns = ({ self, all = false }) => {
       sorter: false,
     },
     {
-      title: t('Rules Number'),
-      dataIndex: 'rulesNumber',
-      render: (value, record) => record.rules.length,
-      isHideable: true,
-      sorter: false,
-    },
-    {
       title: t('Rules'),
       dataIndex: 'rules',
-      render: (rules) =>
-        rules.length ? (
-          <Row>
-            {rules.map((rule) => (
-              <Col span={24} key={rule.direction}>
-                {getRuleValue(rule)}
-              </Col>
-            ))}
-          </Row>
-        ) : (
-          '-'
-        ),
+      width: 500,
+      render: renderRulesColumn,
       sorter: false,
-      stringify: (rules) =>
-        rules.length ? rules.map((rule) => getRuleValue(rule)).join('\n') : '-',
     },
     {
       title: t('Shared'),
       dataIndex: 'shared',
       valueRender: 'yesNo',
       width: 80,
-      sorter: false,
-    },
-    {
-      title: t('Default Policy'),
-      dataIndex: 'is_default',
-      valueRender: 'yesNo',
-      isHideable: true,
-      width: 100,
-      sorter: false,
-    },
-    {
-      title: t('Created At'),
-      dataIndex: 'created_at',
-      valueRender: 'toLocalTime',
-      isHideable: true,
       sorter: false,
     },
   ];

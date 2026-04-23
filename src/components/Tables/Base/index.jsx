@@ -97,6 +97,11 @@ export class BaseTable extends React.Component {
     isAdminPage: PropTypes.bool,
     containerProps: PropTypes.any,
     middleComponentInHeader: PropTypes.node,
+    firstActionClassName: PropTypes.string,
+    rowActionColumnWidth: PropTypes.oneOfType([
+      PropTypes.number,
+      PropTypes.string,
+    ]),
   };
 
   static defaultProps = {
@@ -123,6 +128,8 @@ export class BaseTable extends React.Component {
     primaryActionsExtra: null,
     isAdminPage: false,
     ableSkipPageByBackend: false,
+    firstActionClassName: undefined,
+    rowActionColumnWidth: 150,
   };
 
   constructor(props) {
@@ -472,6 +479,8 @@ export class BaseTable extends React.Component {
       onFinishAction,
       onCancelAction,
       isAdminPage,
+      firstActionClassName,
+      rowActionColumnWidth,
     } = this.props;
     const { hideRow } = this.state;
     const currentColumns = columns
@@ -486,7 +495,7 @@ export class BaseTable extends React.Component {
       {
         title: t('Action'),
         key: 'operation',
-        width: 150,
+        width: rowActionColumnWidth,
         render: (text, record, index) => (
           <ItemActionButtons
             isAdminPage={isAdminPage}
@@ -497,6 +506,7 @@ export class BaseTable extends React.Component {
             index={index}
             containerProps={containerProps}
             onClickAction={onClickAction}
+            firstActionClassName={firstActionClassName}
           />
         ),
       },

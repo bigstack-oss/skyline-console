@@ -83,7 +83,8 @@ export const masakariBase = () => getOpenstackEndpoint('masakari');
 export const ironicOriginEndpoint = () => getOriginEndpoint('ironic');
 export const vpnEndpoint = () => getOriginEndpoint('neutron_vpn');
 export const lbEndpoint = () => getOriginEndpoint('octavia');
-export const qosEndpoint = () => getOriginEndpoint('neutron_qos');
+export const qosEndpoint = () =>
+  getOriginEndpoint('neutron_qos') || getOriginEndpoint('neutron');
 export const swiftEndpoint = () => getOriginEndpoint('swift');
 export const cinderEndpoint = () => getOriginEndpoint('cinder');
 export const manilaEndpoint = () => getOriginEndpoint('manilav2');

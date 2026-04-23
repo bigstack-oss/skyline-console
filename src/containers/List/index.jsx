@@ -582,6 +582,8 @@ export default class BaseList extends React.Component {
       isAdminPage: this.isAdminPage,
       initFilter: this.initFilter,
       middleComponentInHeader: this.middleComponentInTableHeader,
+      firstActionClassName: this.firstActionClassName,
+      rowActionColumnWidth: this.rowActionColumnWidth,
       ...this.getEnabledTableProps(),
     };
   }

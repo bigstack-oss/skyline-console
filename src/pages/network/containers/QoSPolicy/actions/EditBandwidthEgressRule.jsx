@@ -22,6 +22,8 @@ export class EditBandwidthEgressRule extends ModalAction {
 
   static title = t('Edit Bandwidth Egress Limit Rule');
 
+  static buttonText = 'Bandwidth Egress Limit ';
+
   static policy = 'update_policy_bandwidth_limit_rule';
 
   get name() {

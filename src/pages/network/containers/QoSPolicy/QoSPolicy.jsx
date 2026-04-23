@@ -15,18 +15,48 @@
 import { observer, inject } from 'mobx-react';
 import Base from 'containers/List';
 import { QoSPolicyStore } from 'stores/neutron/qos-policy';
-import {
-  getQosPolicyColumns,
-  getQosPolicyFilters,
-} from 'resources/neutron/qos-policy';
+import { getQosPolicyColumns } from 'resources/neutron/qos-policy';
 import { qosEndpoint } from 'client/client/constants';
 import { emptyActionConfig } from 'utils/constants';
 import actionConfigs from './actions';
+import './qos-policy-list.less';
 
 export class QoSPolicy extends Base {
   init() {
     this.store = new QoSPolicyStore();
     this.downloadStore = new QoSPolicyStore();
+  }
+
+  get hideSearch() {
+    return true;
+  }
+
+  get hideRefresh() {
+    return true;
+  }
+
+  get hideDownload() {
+    return true;
+  }
+
+  get hideCustom() {
+    return true;
+  }
+
+  get hideTotal() {
+    return true;
+  }
+
+  get ableAutoFresh() {
+    return false;
+  }
+
+  get firstActionClassName() {
+    return 'qos-policy-wide-first-action';
+  }
+
+  get rowActionColumnWidth() {
+    return 180;
   }
 
   get isProjectTab() {
@@ -136,10 +166,6 @@ export class QoSPolicy extends Base {
 
   getColumns() {
     return getQosPolicyColumns(this.getColumnParamsFromTabKey());
-  }
-
-  get searchFilters() {
-    return getQosPolicyFilters(this.getColumnParamsFromTabKey());
   }
 }
 
