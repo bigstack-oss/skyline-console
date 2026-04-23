@@ -1,0 +1,27 @@
+@import '~styles/variables';
+
+// The shared table action styles cap .first-action span at 48px;
+// Disable the max-width for QoS "Add rule" labels.
+:global {
+  .qos-policy-wide-first-action.ant-btn-link span,
+  .qos-policy-wide-first-action span {
+    max-width: none;
+  }
+
+  .qos-policy-wide-first-action.ant-btn-link[disabled] {
+    color: @light-color06;
+    background: @grey-1;
+    border: 1px solid @light-color04;
+    border-radius: 2px;
+    border-radius: @border-radius;
+    cursor: not-allowed;
+    opacity: 1;
+
+    &:hover,
+    &:focus {
+      color: @light-color06;
+      background: @grey-1;
+      border-color: @light-color04;
+    }
+  }
+}

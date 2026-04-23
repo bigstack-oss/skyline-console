@@ -16,10 +16,12 @@ import { inject, observer } from 'mobx-react';
 import { ModalAction } from 'containers/Action';
 import { QoSPolicyStore } from 'stores/neutron/qos-policy';
 
-export class Edit extends ModalAction {
+export class EditPolicy extends ModalAction {
   static id = 'edit_qos_policy';
 
-  static title = t('Edit QoS Policy');
+  static title = 'Edit QoS Policy';
+
+  static buttonText = 'Edit QoS Policy';
 
   policy = () => ({ rules: [['network', 'edit_qos_policy']] });
 
@@ -42,6 +44,10 @@ export class Edit extends ModalAction {
     return {
       ...item,
     };
+  }
+
+  get tips() {
+    return 'Changes will immediately affect all attached ports';
   }
 
   onSubmit = (values) => this.store.update(this.props.item, values);
@@ -76,4 +82,4 @@ export class Edit extends ModalAction {
   }
 }
 
-export default inject('rootStore')(observer(Edit));
+export default inject('rootStore')(observer(EditPolicy));

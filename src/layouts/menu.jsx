@@ -310,7 +310,7 @@ const renderMenu = (t) => {
           path: '/network/qos-policy',
           name: t('QoS Policies'),
           key: 'networkQos',
-          endpoints: 'neutron_qos',
+          endpoints: 'neutron',
           level: 1,
           children: [
             {

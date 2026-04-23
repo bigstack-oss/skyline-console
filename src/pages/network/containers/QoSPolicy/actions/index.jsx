@@ -12,51 +12,47 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Create from './Create';
-import Edit from './Edit';
-import DeleteAction from './Delete';
-import CreateBandwidthLimitRule from './CreateBandwidthLimitRule';
-import CreateDSCPMarkingRules from './CreateDSCPMarkingRules';
-import DeleteDSCPMarkingRules from './DeleteDSCPMarkingRules';
-import DeleteBandwidthEgressRules from './DeleteBandwidthEgressRules';
-import DeleteBandwidthIngressRules from './DeleteBandwidthIngressRules';
+import CreatePolicy from './CreatePolicy';
+import EditPolicy from './EditPolicy';
+import DeletePolicy from './DeletePolicy';
+import AddRule from './AddRule';
+import DeleteRules from './DeleteRules';
 import EditBandwidthEgressRule from './EditBandwidthEgressRule';
 import EditBandwidthIngressRule from './EditBandwidthIngressRule';
 import EditDSCPMarkingRule from './EditDSCPMarkingRule';
 
+const editRuleActions = [
+  EditBandwidthEgressRule,
+  EditBandwidthIngressRule,
+  EditDSCPMarkingRule,
+];
+
 const actionConfigs = {
+  primaryActions: [CreatePolicy],
+  batchActions: [DeletePolicy],
   rowActions: {
-    firstAction: Edit,
+    firstAction: AddRule,
     moreActions: [
-      { action: CreateBandwidthLimitRule },
-      { action: EditBandwidthEgressRule },
-      { action: EditBandwidthIngressRule },
-      { action: DeleteBandwidthEgressRules },
-      { action: DeleteBandwidthIngressRules },
-      { action: CreateDSCPMarkingRules },
-      { action: EditDSCPMarkingRule },
-      { action: DeleteDSCPMarkingRules },
-      { action: DeleteAction },
+      { action: EditPolicy },
+      { title: 'Edit Rule', actions: editRuleActions },
+      { action: DeleteRules },
+      { action: DeletePolicy },
     ],
   },
-  batchActions: [DeleteAction],
-  primaryActions: [Create],
 };
 
 const consoleActions = {
+  primaryActions: [CreatePolicy],
+  batchActions: [DeletePolicy],
   rowActions: {
-    firstAction: Edit,
+    firstAction: AddRule,
     moreActions: [
-      { action: CreateBandwidthLimitRule },
-      { action: EditBandwidthEgressRule },
-      { action: EditBandwidthIngressRule },
-      { action: DeleteBandwidthEgressRules },
-      { action: DeleteBandwidthIngressRules },
-      { action: DeleteAction },
+      { action: EditPolicy },
+      { title: 'Edit Rule', actions: editRuleActions },
+      { action: DeleteRules },
+      { action: DeletePolicy },
     ],
   },
-  batchActions: [DeleteAction],
-  primaryActions: [Create],
 };
 
 export default { actionConfigs, consoleActions };

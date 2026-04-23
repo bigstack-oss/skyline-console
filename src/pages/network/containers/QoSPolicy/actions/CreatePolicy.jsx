@@ -20,7 +20,7 @@ import { projectTableOptions } from 'resources/keystone/project';
 import { isAdminPage } from 'utils';
 import { toJS } from 'mobx';
 
-export class Create extends ModalAction {
+export class CreatePolicy extends ModalAction {
   static id = 'create_qos_policy';
 
   static title = t('Create QoS Policy');
@@ -31,11 +31,11 @@ export class Create extends ModalAction {
 
   static get modalSize() {
     const { pathname } = window.location;
-    return isAdminPage(pathname) ? 'large' : 'small';
+    return isAdminPage(pathname) ? 'large' : 'middle';
   }
 
   getModalSize() {
-    return this.isAdminPage ? 'large' : 'small';
+    return this.isAdminPage ? 'large' : 'middle';
   }
 
   static policy = 'create_policy';
@@ -122,4 +122,4 @@ export class Create extends ModalAction {
     ];
   }
 }
-export default inject('rootStore')(observer(Create));
+export default inject('rootStore')(observer(CreatePolicy));

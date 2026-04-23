@@ -15,13 +15,13 @@
 import { ConfirmAction } from 'containers/Action';
 import globalQoSPolicyStore from 'stores/neutron/qos-policy';
 
-export default class DeleteAction extends ConfirmAction {
+export default class DeletePolicy extends ConfirmAction {
   get id() {
-    return 'delete-ingress';
+    return 'delete';
   }
 
   get title() {
-    return t('Delete Bandwidth Ingress Rules');
+    return t('Delete QoS Policy');
   }
 
   get isDanger() {
@@ -29,25 +29,22 @@ export default class DeleteAction extends ConfirmAction {
   }
 
   get buttonText() {
-    return t('Delete Bandwidth Ingress Rules');
+    return 'Delete Policy';
   }
 
   get actionName() {
-    return t('delete bandwidth ingress rules');
+    return t('delete qos policy');
   }
 
-  policy = 'delete_policy_bandwidth_limit_rule';
+  policy = 'delete_policy';
+
+  aliasPolicy = 'neutron:delete_policy';
 
   allowedCheckFunc = (item) => {
     if (!item) {
       return true;
     }
-    return this.isOwnerOrAdmin(item) && this.hasIngressRule(item);
-  };
-
-  hasIngressRule = (item) => {
-    const { rules = [] } = item;
-    return rules.some((i) => i.direction === 'ingress');
+    return this.isOwnerOrAdmin(item);
   };
 
   isOwnerOrAdmin() {
@@ -55,10 +52,5 @@ export default class DeleteAction extends ConfirmAction {
     return true;
   }
 
-  onSubmit = (data) => {
-    const { id } = data.rules.find(
-      (item) => item.type === 'bandwidth_limit' && item.direction === 'ingress'
-    );
-    return globalQoSPolicyStore.deleteBandwidthLimitRules(data, id);
-  };
+  onSubmit = (data) => globalQoSPolicyStore.delete(data);
 }
