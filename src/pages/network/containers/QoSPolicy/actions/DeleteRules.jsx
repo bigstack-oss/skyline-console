@@ -4,8 +4,8 @@ import globalQoSPolicyStore from 'stores/neutron/qos-policy';
 import {
   getRuleDirectionLabel,
   getRuleTypeLabel,
-  getRuleDetailLabel,
-} from './utils';
+  getRuleDetail,
+} from '../utils/label';
 
 export class DeleteRules extends ModalAction {
   static id = 'delete-rules';
@@ -71,7 +71,7 @@ export class DeleteRules extends ModalAction {
           {
             title: t('Details'),
             dataIndex: 'detail',
-            render: (_, record) => getRuleDetailLabel(record),
+            render: (_, record) => getRuleDetail(record),
           },
         ],
       },

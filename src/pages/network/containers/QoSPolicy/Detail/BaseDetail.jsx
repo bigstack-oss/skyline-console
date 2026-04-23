@@ -14,62 +14,94 @@
 
 import { inject, observer } from 'mobx-react';
 import Base from 'containers/BaseDetail';
+import {
+  RULE_DIRECTION_EGRESS,
+  RULE_DIRECTION_INGRESS,
+  RULE_TYPE_BANDWIDTH_LIMIT,
+  RULE_TYPE_DSCP_MARKING,
+} from '../utils/const';
+import { getBandwidthLimitOptions } from '../utils/label';
 
 export class BaseDetail extends Base {
-  get leftCards() {
-    return [...this.BandwidthCard, this.DSCPMarkingCard];
-  }
-
-  getOptions(rule) {
-    const { max_kbps = '-', max_burst_kbps = '-' } = rule || {};
-    const options = [
+  getBandwidthOptions(rule) {
+    const { limitInMbps, burstInMbps } = getBandwidthLimitOptions(rule);
+    return [
       {
         label: t('Max BandWidth'),
-        content: `${max_kbps === '-' ? max_kbps : max_kbps / 1024} Mbps`,
+        content: `${limitInMbps} Mbps`,
       },
       {
         label: t('Max Burst'),
-        content: `${
-          max_burst_kbps === '-' ? max_burst_kbps : max_burst_kbps / 1024
-        } Mbps`,
+        content: `${burstInMbps} Mbps`,
       },
     ];
-    return options;
   }
 
-  get BandwidthCard() {
+  get BandwidthCards() {
     const { rules = [] } = this.detailData;
     const egressRule = rules.find(
-      (item) => item.type === 'bandwidth_limit' && item.direction === 'egress'
+      (item) =>
+        item.type === RULE_TYPE_BANDWIDTH_LIMIT &&
+        item.direction === RULE_DIRECTION_EGRESS
     );
     const ingressRule = rules.find(
-      (item) => item.type === 'bandwidth_limit' && item.direction === 'ingress'
+      (item) =>
+        item.type === RULE_TYPE_BANDWIDTH_LIMIT &&
+        item.direction === RULE_DIRECTION_INGRESS
     );
-    return [
-      {
+
+    const cards = [];
+    if (egressRule) {
+      cards.push({
         title: t('BandWidth Limit Egress'),
-        options: this.getOptions(egressRule),
-      },
-      {
+        options: this.getBandwidthOptions(egressRule),
+      });
+    }
+    if (ingressRule) {
+      cards.push({
         title: t('BandWidth Limit Ingress'),
-        options: this.getOptions(ingressRule),
-      },
-    ];
+        options: this.getBandwidthOptions(ingressRule),
+      });
+    }
+
+    return cards;
   }
 
-  get DSCPMarkingCard() {
+  get DSCPMarkingCards() {
     const { rules = [] } = this.detailData;
-    const dscpRule = rules.find((item) => item.type === 'dscp_marking') || {};
-    const options = [
-      {
-        label: t('Value'),
-        content: dscpRule.dscp_mark === 0 ? '0' : dscpRule.dscp_mark || '-',
-      },
-    ];
+    const dscpRule = rules.find((item) => item.type === RULE_TYPE_DSCP_MARKING);
+
+    const card = [];
+    if (dscpRule) {
+      card.push({
+        title: t('DSCP Marking'),
+        options: [
+          {
+            label: t('Value'),
+            content: dscpRule.dscp_mark,
+          },
+        ],
+      });
+    }
+
+    return card;
+  }
+
+  get emptyRulesCard() {
     return {
-      title: t('DSCP Marking'),
-      options,
+      title: t('No rules are configured'),
+      options: [
+        {
+          label: '-',
+          content: '',
+        },
+      ],
     };
+  }
+
+  get leftCards() {
+    const cards = [...this.BandwidthCards, ...this.DSCPMarkingCards];
+    return cards.length ? cards : [this.emptyRulesCard];
   }
 }
 

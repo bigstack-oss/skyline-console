@@ -21,7 +21,7 @@ import {
   RULE_DIRECTION_INGRESS,
   RULE_DIRECTION_EGRESS,
   dscpMarkingItems,
-} from './ruleUtils';
+} from '../utils/const';
 
 export class AddRule extends ModalAction {
   static id = 'add_qos_rule';

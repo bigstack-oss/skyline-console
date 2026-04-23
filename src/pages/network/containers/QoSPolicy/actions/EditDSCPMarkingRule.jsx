@@ -16,7 +16,7 @@ import React from 'react';
 import { inject, observer } from 'mobx-react';
 import { ModalAction } from 'containers/Action';
 import globalQoSPolicyStore from 'stores/neutron/qos-policy';
-import { dscpMarkingItems } from './ruleUtils';
+import { dscpMarkingItems } from '../utils/const';
 
 export class EditDSCPMarkingRule extends ModalAction {
   static id = 'edit_DSCP_marking_rule';
