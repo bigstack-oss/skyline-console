@@ -50,6 +50,7 @@ import RevertResize from './RevertResize';
 import ModifyTags from './ModifyTags';
 import { Monitor } from './Monitor';
 import { ResetState } from './ResetState';
+import { ModifyQoSPolicy } from './ModifyQoSPolicy';
 
 const statusActions = [
   StartAction,
@@ -146,6 +147,9 @@ const actionConfigs = {
       {
         action: ModifyTags,
       },
+      {
+        action: ModifyQoSPolicy,
+      },
     ],
   },
   batchActions,
@@ -178,6 +182,9 @@ const adminActions = {
       },
       {
         action: ConfirmResize,
+      },
+      {
+        action: ModifyQoSPolicy,
       },
     ],
   },

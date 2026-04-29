@@ -52,7 +52,9 @@ export class ModifyQoS extends ModalAction {
         id: '',
       },
     };
-    this.item.qos_policy_id && this.getQosPolicyItem();
+    if (this.item.qos_policy_id) {
+      this.getQosPolicyItem();
+    }
   }
 
   async getQosPolicyItem() {
@@ -62,7 +64,42 @@ export class ModifyQoS extends ModalAction {
     this.setState({
       qosPolicy: item,
     });
+    this.updateFormValue('qos_policy_id', this.getQosPolicyFormValue(item));
   }
+
+  getQosPolicyTab = (policy) => {
+    if (!policy) {
+      return 'project';
+    }
+    if (policy.project_id === this.currentProjectId) {
+      return 'project';
+    }
+    if (policy.shared) {
+      return 'shared';
+    }
+    return this.hasAdminRole ? 'all' : 'project';
+  };
+
+  getQosPolicyFormValue = (policy) => {
+    const policyId = policy?.id || this.item.qos_policy_id;
+    if (!policyId) {
+      return {
+        selectedRowKeys: [],
+        selectedRows: [],
+        tab: 'project',
+      };
+    }
+    return {
+      selectedRowKeys: [policyId],
+      selectedRows: [
+        {
+          id: policyId,
+          name: policy?.name || policyId,
+        },
+      ],
+      tab: this.getQosPolicyTab(policy),
+    };
+  };
 
   get instanceName() {
     return this.item.name || this.item.id;
@@ -72,17 +109,7 @@ export class ModifyQoS extends ModalAction {
     const enableQosPolicy = this.item.qos_policy_id !== null;
     return {
       enableQosPolicy,
-      qos_policy_id: {
-        selectedRowKeys: enableQosPolicy ? [this.item.qos_policy_id] : [],
-        selectedRows: enableQosPolicy
-          ? [
-              {
-                id: this.item.qos_policy_id,
-                name: this.item.qos_policy_id,
-              },
-            ]
-          : [],
-      },
+      qos_policy_id: enableQosPolicy ? this.getQosPolicyFormValue() : {},
     };
   }
 
@@ -96,12 +123,11 @@ export class ModifyQoS extends ModalAction {
     const data = {
       qos_policy_id: null,
     };
-    if (enableQosPolicy) {
-      qos_policy_id &&
-        (data.qos_policy_id =
-          qos_policy_id.selectedRowKeys.length === 0
-            ? null
-            : qos_policy_id.selectedRowKeys[0]);
+    if (enableQosPolicy && qos_policy_id) {
+      data.qos_policy_id =
+        qos_policy_id.selectedRowKeys.length === 0
+          ? null
+          : qos_policy_id.selectedRowKeys[0];
     }
     return globalPortStore.update({ id }, data);
   };
@@ -131,9 +157,7 @@ export class ModifyQoS extends ModalAction {
         name: 'qos_policy_id',
         label: t('QoS Policy'),
         type: 'tab-select-table',
-        tabs: getQoSPolicyTabs.call(this, {
-          disabledFunc: (item) => item.id === this.item.qos_policy_id,
-        }),
+        tabs: getQoSPolicyTabs.call(this),
         isMulti: false,
         required: true,
         tip: t('Choosing a QoS policy can limit bandwidth and DSCP'),

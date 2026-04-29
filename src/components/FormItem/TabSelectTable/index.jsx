@@ -17,7 +17,7 @@ import SelectTable, {
   renderClearButton,
 } from 'components/FormItem/SelectTable';
 import { Tabs, Tag } from 'antd';
-import { isEmpty } from 'lodash';
+import { isEmpty, isEqual } from 'lodash';
 
 export default class TabSelectTable extends Component {
   constructor(props) {
@@ -30,6 +30,28 @@ export default class TabSelectTable extends Component {
       selectedRows: value.selectedRows || [],
     };
     this.init(props);
+  }
+
+  componentDidUpdate(prevProps) {
+    const { value = {}, tabs = [], defaultTab } = this.props;
+    if (isEqual(prevProps.value, value) && isEqual(prevProps.tabs, tabs)) {
+      return;
+    }
+    const nextState = {
+      tabKey: value.tab || defaultTab || (tabs[0] && tabs[0].key),
+      selectedRowKeys: value.selectedRowKeys || [],
+      selectedRows: value.selectedRows || [],
+    };
+    const { tabKey, selectedRowKeys, selectedRows } = this.state;
+    if (
+      tabKey === nextState.tabKey &&
+      isEqual(selectedRowKeys, nextState.selectedRowKeys) &&
+      isEqual(selectedRows, nextState.selectedRows)
+    ) {
+      return;
+    }
+    // eslint-disable-next-line react/no-did-update-set-state
+    this.setState(nextState);
   }
 
   handleChangeTab = (tabKey) => {
