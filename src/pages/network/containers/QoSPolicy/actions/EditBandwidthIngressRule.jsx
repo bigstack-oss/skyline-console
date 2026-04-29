@@ -16,18 +16,31 @@ import React from 'react';
 import { inject, observer } from 'mobx-react';
 import { ModalAction } from 'containers/Action';
 import globalQoSPolicyStore from 'stores/neutron/qos-policy';
+import { firstUpperCase } from 'utils';
 
 export class EditBandwidthIngressRule extends ModalAction {
   static id = 'edit_bandwidth_ingress_limit_rule';
 
   static title = t('Edit Bandwidth Ingress Limit Rule');
 
-  static buttonText = 'Bandwidth Ingress Limit ';
+  static buttonText = t('BandWidth Limit Ingress');
 
   static policy = 'update_policy_bandwidth_limit_rule';
 
   get name() {
     return t('Edit Bandwidth Ingress Limit Rule');
+  }
+
+  get tips() {
+    return t('Changes will immediately affect all attached ports');
+  }
+
+  get successText() {
+    return firstUpperCase(t('{action} successfully.', { action: this.name }));
+  }
+
+  get errorText() {
+    return t('Unable to {action}.', { action: this.name.toLowerCase() });
   }
 
   static allowed = (item) => {

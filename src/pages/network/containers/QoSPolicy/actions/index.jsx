@@ -34,7 +34,7 @@ const actionConfigs = {
     firstAction: AddRule,
     moreActions: [
       { action: EditPolicy },
-      { title: 'Edit Rule', actions: editRuleActions },
+      { title: t('Edit Rule'), actions: editRuleActions },
       { action: DeleteRules },
       { action: DeletePolicy },
     ],
@@ -48,7 +48,7 @@ const consoleActions = {
     firstAction: AddRule,
     moreActions: [
       { action: EditPolicy },
-      { title: 'Edit Rule', actions: editRuleActions },
+      { title: t('Edit Rule'), actions: editRuleActions },
       { action: DeleteRules },
       { action: DeletePolicy },
     ],

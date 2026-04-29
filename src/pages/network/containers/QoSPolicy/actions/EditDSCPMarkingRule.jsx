@@ -16,6 +16,7 @@ import React from 'react';
 import { inject, observer } from 'mobx-react';
 import { ModalAction } from 'containers/Action';
 import globalQoSPolicyStore from 'stores/neutron/qos-policy';
+import { firstUpperCase } from 'utils';
 import { dscpMarkingItems } from '../utils/const';
 
 export class EditDSCPMarkingRule extends ModalAction {
@@ -23,12 +24,24 @@ export class EditDSCPMarkingRule extends ModalAction {
 
   static title = t('Edit DSCP Marking Rule');
 
-  static buttonText = 'DSCP Marking';
+  static buttonText = t('DSCP Marking');
 
   static policy = 'update_policy_dscp_marking_rule';
 
   get name() {
     return t('Edit DSCP Marking Rule');
+  }
+
+  get tips() {
+    return t('Changes will immediately affect all attached ports');
+  }
+
+  get successText() {
+    return firstUpperCase(t('{action} successfully.', { action: this.name }));
+  }
+
+  get errorText() {
+    return t('Unable to {action}.', { action: this.name.toLowerCase() });
   }
 
   static allowed = (item) => {

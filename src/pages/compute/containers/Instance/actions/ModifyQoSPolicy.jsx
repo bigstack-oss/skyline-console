@@ -23,9 +23,9 @@ import { qosEndpoint } from 'client/client/constants';
 export class ModifyQoSPolicy extends ModalAction {
   static id = 'modify_qos_policy';
 
-  static title = 'Modify QoS Policy';
+  static title = t('Modify QoS Policy');
 
-  static buttonText = 'Modify QoS Policy';
+  static buttonText = t('Modify QoS Policy');
 
   static policy = 'update_port';
 

@@ -11,8 +11,8 @@ import {
  * @returns string
  */
 export const getRuleTypeLabel = (ruleType) => {
-  if (ruleType === RULE_TYPE_BANDWIDTH_LIMIT) return 'Bandwidth Limit';
-  if (ruleType === RULE_TYPE_DSCP_MARKING) return 'DSCP Marking';
+  if (ruleType === RULE_TYPE_BANDWIDTH_LIMIT) return t('Bandwidth limit');
+  if (ruleType === RULE_TYPE_DSCP_MARKING) return t('DSCP Marking');
   return '-';
 };
 
@@ -22,8 +22,8 @@ export const getRuleTypeLabel = (ruleType) => {
  * @returns string
  */
 export const getRuleDirectionLabel = (ruleDirection) => {
-  if (ruleDirection === RULE_DIRECTION_INGRESS) return 'Ingress';
-  if (ruleDirection === RULE_DIRECTION_EGRESS) return 'Egress';
+  if (ruleDirection === RULE_DIRECTION_INGRESS) return t('Ingress');
+  if (ruleDirection === RULE_DIRECTION_EGRESS) return t('Egress');
   return '-';
 };
 

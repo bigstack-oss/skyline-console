@@ -14,6 +14,7 @@
 
 import { inject, observer } from 'mobx-react';
 import { ModalAction } from 'containers/Action';
+import { firstUpperCase } from 'utils';
 import globalQoSPolicyStore from 'stores/neutron/qos-policy';
 import {
   RULE_TYPE_BANDWIDTH_LIMIT,
@@ -26,9 +27,9 @@ import {
 export class AddRule extends ModalAction {
   static id = 'add_qos_rule';
 
-  static title = 'Add Rule';
+  static title = t('Add Rule');
 
-  static buttonText = 'Add Rule';
+  static buttonText = t('Add Rule');
 
   static policy = {
     rules: [
@@ -56,6 +57,18 @@ export class AddRule extends ModalAction {
 
   get nameForStateUpdate() {
     return ['rule_type'];
+  }
+
+  get actionName() {
+    return t('create rule');
+  }
+
+  get successText() {
+    return firstUpperCase(t('{action} successfully.', { action: this.name }));
+  }
+
+  get errorText() {
+    return t('Unable to {action}.', { action: this.name.toLowerCase() });
   }
 
   canCreateBandwidth(rules) {
@@ -187,7 +200,7 @@ export class AddRule extends ModalAction {
       },
       {
         name: 'max_kbps',
-        label: 'Max Bandwidth (Mbps)',
+        label: t('Max BandWidth (Mbps)'),
         type: 'slider-input',
         max: 10000,
         min: 1,
@@ -199,7 +212,7 @@ export class AddRule extends ModalAction {
       },
       {
         name: 'max_burst_kbps',
-        label: t('Burst limit'),
+        label: t('Max Burst (Mbps)'),
         type: 'slider-input',
         max: 10000,
         min: 1,

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import { ConfirmAction } from 'containers/Action';
+import { firstUpperCase } from 'utils';
 import globalQoSPolicyStore from 'stores/neutron/qos-policy';
 
 export default class DeletePolicy extends ConfirmAction {
@@ -29,11 +30,19 @@ export default class DeletePolicy extends ConfirmAction {
   }
 
   get buttonText() {
-    return 'Delete Policy';
+    return t('Delete Policy');
   }
 
   get actionName() {
     return t('delete qos policy');
+  }
+
+  get successText() {
+    return firstUpperCase(t('{action} successfully.', { action: this.name }));
+  }
+
+  get errorText() {
+    return t('Unable to {action}.', { action: this.name.toLowerCase() });
   }
 
   policy = 'delete_policy';
@@ -51,6 +60,19 @@ export default class DeletePolicy extends ConfirmAction {
     // TODO: check owner
     return true;
   }
+
+  confirmContext = (data) => {
+    if (!this.messageHasItemName) {
+      return t('Are you sure to {action}?', {
+        action: this.actionNameDisplay || this.title,
+      });
+    }
+    const name = this.getName(data);
+    return t('Are you sure to {action} (policy: {name})?', {
+      action: this.actionNameDisplay || this.title,
+      name,
+    });
+  };
 
   onSubmit = (data) => globalQoSPolicyStore.delete(data);
 }
