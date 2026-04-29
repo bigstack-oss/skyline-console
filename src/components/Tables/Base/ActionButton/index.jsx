@@ -432,7 +432,12 @@ export class ActionButton extends Component {
 
   onClickModalActionOk = () => {
     const { containerProps } = this.props;
-    return this.formRef.current.wrappedInstance.onClickSubmit(
+    const actionInstance =
+      this.formRef.current?.wrappedInstance || this.formRef.current;
+    if (!actionInstance?.onClickSubmit) {
+      return undefined;
+    }
+    return actionInstance.onClickSubmit(
       (success, fail) => {
         this.handleSubmitLoading();
         this.onClickModalActionCancel(true);
@@ -448,7 +453,9 @@ export class ActionButton extends Component {
   onClickModalActionCancel = (finish) => {
     const callback = () => {
       if (!isBoolean(finish)) {
-        this.formRef.current.wrappedInstance.onClickCancel();
+        const actionInstance =
+          this.formRef.current?.wrappedInstance || this.formRef.current;
+        actionInstance?.onClickCancel && actionInstance.onClickCancel();
       }
       const { onCancelAction } = this.props;
       this.setState(
