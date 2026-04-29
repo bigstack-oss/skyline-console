@@ -17,7 +17,7 @@ import { ModalAction } from 'containers/Action';
 import globalProjectStore from 'stores/keystone/project';
 import { QoSPolicyStore } from 'stores/neutron/qos-policy';
 import { projectTableOptions } from 'resources/keystone/project';
-import { isAdminPage } from 'utils';
+import { isAdminPage, firstUpperCase } from 'utils';
 import { toJS } from 'mobx';
 
 export class CreatePolicy extends ModalAction {
@@ -27,6 +27,18 @@ export class CreatePolicy extends ModalAction {
 
   get name() {
     return t('Create QoS Policy');
+  }
+
+  get actionName() {
+    return t('create qos policy');
+  }
+
+  get successText() {
+    return firstUpperCase(t('{action} successfully.', { action: this.name }));
+  }
+
+  get errorText() {
+    return t('Unable to {action}.', { action: this.name.toLowerCase() });
   }
 
   static get modalSize() {

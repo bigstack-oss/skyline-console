@@ -25,7 +25,7 @@ export class QoSPolicyDetail extends Base {
   }
 
   get name() {
-    return t('qoS policy');
+    return t('qos policy');
   }
 
   get policy() {

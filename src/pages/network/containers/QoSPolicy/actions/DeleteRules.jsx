@@ -1,6 +1,7 @@
 import { inject, observer } from 'mobx-react';
 import { ModalAction } from 'containers/Action';
 import globalQoSPolicyStore from 'stores/neutron/qos-policy';
+import { firstUpperCase } from 'utils';
 import {
   getRuleDirectionLabel,
   getRuleTypeLabel,
@@ -44,7 +45,15 @@ export class DeleteRules extends ModalAction {
   }
 
   get tips() {
-    return 'Changes will immediately affect all attached ports';
+    return t('Changes will immediately affect all attached ports');
+  }
+
+  get successText() {
+    return firstUpperCase(t('{action} successfully.', { action: this.name }));
+  }
+
+  get errorText() {
+    return t('Unable to {action}.', { action: this.name.toLowerCase() });
   }
 
   get formItems() {
