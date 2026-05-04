@@ -15,7 +15,10 @@
 import { observer, inject } from 'mobx-react';
 import Base from 'containers/List';
 import { QoSPolicyStore } from 'stores/neutron/qos-policy';
-import { getQosPolicyColumns } from 'resources/neutron/qos-policy';
+import {
+  getQosPolicyColumns,
+  getQosPolicyFilters,
+} from 'resources/neutron/qos-policy';
 import { qosEndpoint } from 'client/client/constants';
 import { emptyActionConfig } from 'utils/constants';
 import actionConfigs from './actions';
@@ -25,10 +28,6 @@ export class QoSPolicy extends Base {
   init() {
     this.store = new QoSPolicyStore();
     this.downloadStore = new QoSPolicyStore();
-  }
-
-  get hideSearch() {
-    return true;
   }
 
   get hideRefresh() {
@@ -166,6 +165,10 @@ export class QoSPolicy extends Base {
 
   getColumns() {
     return getQosPolicyColumns(this.getColumnParamsFromTabKey());
+  }
+
+  get searchFilters() {
+    return getQosPolicyFilters(this.getColumnParamsFromTabKey());
   }
 }
 
