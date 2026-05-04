@@ -14,7 +14,6 @@
 
 import React from 'react';
 import { merge } from 'lodash';
-import { yesNoOptions } from 'utils/constants';
 import { getRuleSummary } from 'pages/network/containers/QoSPolicy/utils/label';
 
 const renderRulesColumn = (rules) => {
@@ -67,31 +66,13 @@ export const getQosPolicyColumns = ({ self, all = false }) => {
   return ret;
 };
 
-export const getQosPolicyFilters = ({ self, shared = false }) => {
-  const ret = [
+export const getQosPolicyFilters = () => {
+  return [
     {
       label: t('Name'),
       name: 'name',
     },
-    {
-      label: t('Description'),
-      name: 'description',
-    },
   ];
-  if (!shared) {
-    ret.push({
-      label: t('Shared'),
-      name: 'shared',
-      options: yesNoOptions,
-    });
-  }
-  if (self.hasAdminRole) {
-    ret.push({
-      label: t('Project ID'),
-      name: 'tenant_id',
-    });
-  }
-  return ret;
 };
 
 export const qosPolicySortProps = {
