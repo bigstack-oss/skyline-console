@@ -180,15 +180,16 @@ export class FlavorSelectTable extends Component {
 
   get columns() {
     const { arch } = this.state;
+    const { extraColumns = [] } = this.props;
     const base = this.getBaseColumns();
     if (isBareMetal(arch)) {
-      return [...base.filter((it, index) => index < 3)];
+      return [...base.filter((it, index) => index < 3), ...extraColumns];
     }
     if (arch !== 'heterogeneous_computing') {
-      return base;
+      return [...base, ...extraColumns];
     }
     const gpus = this.getGpuColumns();
-    return [...base, ...gpus];
+    return [...base, ...gpus, ...extraColumns];
   }
 
   onArchChange = (e) => {
