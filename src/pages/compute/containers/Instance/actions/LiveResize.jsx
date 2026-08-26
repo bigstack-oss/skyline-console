@@ -21,6 +21,7 @@ import {
   isNotLockedOrAdmin,
   checkStatus,
   isIronicInstance,
+  isBootFromVolume,
 } from 'resources/nova/instance';
 import FlavorSelectTable from '../components/FlavorSelectTable';
 import {
@@ -151,7 +152,13 @@ export class LiveResize extends ModalAction {
     if (vcpus < curVcpus || ram < curRam) {
       return t('Live resize is grow-only');
     }
-    if (curDisk !== undefined && disk !== curDisk) {
+    // boot-from-volume roots come from the volume, so the flavor's root_gb is
+    // ignored -- the API skips this check for them too
+    if (
+      !isBootFromVolume(this.item) &&
+      curDisk !== undefined &&
+      disk !== curDisk
+    ) {
       return t('Root disk size must not change');
     }
     if (vcpus === curVcpus && ram === curRam) {
