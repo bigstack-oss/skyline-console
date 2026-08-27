@@ -79,7 +79,23 @@ export class LiveResize extends ModalAction {
 
   init() {
     this.store = globalFlavorStore;
+    this.state.plan = null;
     fetchQuota(this);
+    this.fetchPlan();
+  }
+
+  // The instance's real hotplug ceiling, boot source and current shape, in one
+  // call. Until it arrives -- and for instances booted before the ceiling was
+  // recorded -- we fall back to the config-derived estimate, which is wrong
+  // whenever the flavor carried an hw:max_* override. plan.ceiling_is_exact
+  // says which one we are looking at.
+  async fetchPlan() {
+    try {
+      const plan = await globalServerStore.getResizePlan(this.item.id);
+      this.setState({ plan });
+    } catch (e) {
+      this.setState({ plan: null });
+    }
   }
 
   get name() {
@@ -96,7 +112,7 @@ export class LiveResize extends ModalAction {
 
   get tips() {
     return t(
-      'Grows the CPU / memory of a running instance without reboot, up to its hotplug ceiling (4x the current flavor by default). Instances created before this feature was enabled need one hard reboot first. If the current host is full, the instance is live-migrated to a fitting host automatically.'
+      'Each flavor is marked LIVE or COLD. LIVE grows CPU / memory with no reboot, live-migrating the instance if the current host is full; it does not guarantee the guest brings the new resources online. COLD restarts the instance, may move it to another host, and waits for you to confirm or revert.'
     );
   }
 
@@ -137,11 +153,37 @@ export class LiveResize extends ModalAction {
   // Why this flavor is not a legal live-resize target, or null if it is.
   // Mirrors the API's _lr_validate so the table never greys a row out
   // without saying why.
+  get headroom() {
+    const { plan } = this.state;
+    if (plan) {
+      return { maxVcpus: plan.max_vcpus, maxRam: plan.max_memory_mb };
+    }
+    return getHeadroom(this.item.flavor_info || {});
+  }
+
+  get isBfv() {
+    const { plan } = this.state;
+    return plan ? plan.boot_from_volume : isBootFromVolume(this.item);
+  }
+
+  // Why this flavor cannot be grown LIVE, or null if it can. A reason here
+  // does not mean the flavor is unusable -- cold resize can do everything
+  // live cannot, which is the point of badging rather than greying out.
   liveResizeReason = (flavor) => {
+    const { plan } = this.state;
     const current = this.item.flavor_info || {};
     const { vcpus: curVcpus, ram: curRam, disk: curDisk } = current;
     const { vcpus, ram, disk } = flavor || {};
-    const { maxVcpus, maxRam } = getHeadroom(current);
+    const { maxVcpus, maxRam } = this.headroom;
+    // The plan could not read a ceiling off the instance and fell back to one
+    // computed from config, which tracks the current headroom-factor tuning
+    // rather than what the running domain was actually built with. Anything
+    // booted before the headroom patch has no ceiling in its XML at all, so
+    // the driver refuses a live resize there whatever the estimate says.
+    // Never promise LIVE on a guess; a hard reboot records the real ceiling.
+    if (plan && plan.ceiling_is_exact === false) {
+      return t('This instance has no recorded hotplug ceiling yet');
+    }
     if (!maxVcpus && !maxRam) {
       return t('This instance opts out of live resize');
     }
@@ -154,15 +196,8 @@ export class LiveResize extends ModalAction {
     }
     // boot-from-volume roots come from the volume, so the flavor's root_gb is
     // ignored -- the API skips this check for them too
-    if (
-      !isBootFromVolume(this.item) &&
-      curDisk !== undefined &&
-      disk !== curDisk
-    ) {
+    if (!this.isBfv && curDisk !== undefined && disk !== curDisk) {
       return t('Root disk size must not change');
-    }
-    if (vcpus === curVcpus && ram === curRam) {
-      return t('Already the current flavor');
     }
     if (vcpus > curVcpus && vcpus > maxVcpus) {
       return t('Above the hotplug ceiling of {max} vCPU', { max: maxVcpus });
@@ -170,20 +205,43 @@ export class LiveResize extends ModalAction {
     if (ram > curRam && ram > maxRam) {
       return t('Above the hotplug ceiling of {max} MB memory', { max: maxRam });
     }
+    return null;
+  };
+
+  // Genuinely unusable by either path. Everything else is at worst COLD, so it
+  // stays selectable with a badge rather than being silently greyed out.
+  unusableReason = (flavor) => {
+    const { vcpus: curVcpus, ram: curRam } = this.item.flavor_info || {};
+    const { vcpus, ram } = flavor || {};
+    if (vcpus === curVcpus && ram === curRam) {
+      return t('Already the current flavor');
+    }
     if (checkFlavorDisable(flavor, this)) {
       return t('Exceeds your remaining quota');
     }
     return null;
   };
 
-  disabledFlavor = (flavor) => !!this.liveResizeReason(flavor);
+  resizeMode = (flavor) =>
+    this.liveResizeReason(flavor) === null ? 'live' : 'cold';
+
+  disabledFlavor = (flavor) => !!this.unusableReason(flavor);
 
   get reasonColumn() {
     return [
       {
-        title: t('Not Selectable Because'),
-        dataIndex: 'cube_live_resize_reason',
-        render: (value, record) => this.liveResizeReason(record) || '-',
+        title: t('Resize Mode'),
+        dataIndex: 'cube_resize_mode',
+        render: (value, record) => {
+          const blocked = this.unusableReason(record);
+          if (blocked) {
+            return blocked;
+          }
+          const why = this.liveResizeReason(record);
+          return why === null
+            ? t('LIVE - no reboot')
+            : `${t('COLD - restarts the instance')}: ${why}`;
+        },
       },
     ];
   }
@@ -232,7 +290,11 @@ export class LiveResize extends ModalAction {
     const { id } = this.item;
     const { newFlavor } = values;
     const flavor = newFlavor.selectedRowKeys[0];
-    return globalServerStore.liveResize({ id, flavor });
+    // Send the mode the operator was shown. The API re-checks it and refuses a
+    // 'live' request it can no longer honour rather than quietly going cold --
+    // the envelope this decision came from was fetched when the dialog opened.
+    const mode = this.resizeMode(newFlavor.selectedRows[0]);
+    return globalServerStore.cubeResize({ id, flavor, mode });
   };
 }
 
