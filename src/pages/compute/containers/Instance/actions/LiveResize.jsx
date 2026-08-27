@@ -217,9 +217,12 @@ export class LiveResize extends ModalAction {
   // Genuinely unusable by either path. Everything else is at worst COLD, so it
   // stays selectable with a badge rather than being silently greyed out.
   unusableReason = (flavor) => {
-    const { vcpus: curVcpus, ram: curRam } = this.item.flavor_info || {};
-    const { vcpus, ram } = flavor || {};
-    if (vcpus === curVcpus && ram === curRam) {
+    const current = this.item.flavor_info || {};
+    // identity, not shape: two different flavors can share vCPU/RAM and still
+    // differ in disk or extra specs, and a cold resize between them is
+    // legitimate. The API compares flavor id for the same reason.
+    const currentName = current.original_name;
+    if (currentName !== undefined && flavor && flavor.name === currentName) {
       return t('Already the current flavor');
     }
     if (checkFlavorDisable(flavor, this)) {
