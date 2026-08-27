@@ -45,6 +45,13 @@ export class NovaClient extends Base {
             key: 'tags',
             responseKey: 'tag',
           },
+          {
+            // cube: capability envelope for the resize dialog -- ceiling,
+            // boot source and current shape, fetched once per instance
+            name: 'resizePlan',
+            key: 'resize-plan',
+            responseKey: 'resize_plan',
+          },
         ],
         extendOperations: [
           {
