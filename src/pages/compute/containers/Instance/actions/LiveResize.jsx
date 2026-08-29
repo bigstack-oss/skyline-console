@@ -13,6 +13,12 @@
 // limitations under the License.
 
 import React from 'react';
+import { Tooltip } from 'antd';
+import {
+  PoweroffOutlined,
+  StopOutlined,
+  ThunderboltOutlined,
+} from '@ant-design/icons';
 import { inject, observer } from 'mobx-react';
 import globalFlavorStore from 'stores/nova/flavor';
 import globalServerStore from 'stores/nova/instance';
@@ -236,21 +242,51 @@ export class LiveResize extends ModalAction {
 
   disabledFlavor = (flavor) => !!this.unusableReason(flavor);
 
+  // Icon plus tooltip rather than a sentence per row: the reason can be long,
+  // and a table of prose is unreadable. Shape carries the meaning, not just
+  // colour, so the distinction survives a mono display.
+  renderModeIcon = (record) => {
+    const blocked = this.unusableReason(record);
+    if (blocked) {
+      return (
+        <Tooltip title={blocked}>
+          <StopOutlined
+            aria-label={blocked}
+            style={{ color: '#bfbfbf', fontSize: 16 }}
+          />
+        </Tooltip>
+      );
+    }
+    const why = this.liveResizeReason(record);
+    if (why === null) {
+      const label = t('LIVE - no reboot');
+      return (
+        <Tooltip title={label}>
+          <ThunderboltOutlined
+            aria-label={label}
+            style={{ color: '#52c41a', fontSize: 16 }}
+          />
+        </Tooltip>
+      );
+    }
+    const label = `${t('COLD - restarts the instance')}: ${why}`;
+    return (
+      <Tooltip title={label}>
+        <PoweroffOutlined
+          aria-label={label}
+          style={{ color: '#fa8c16', fontSize: 16 }}
+        />
+      </Tooltip>
+    );
+  };
+
   get reasonColumn() {
     return [
       {
         title: t('Resize Mode'),
         dataIndex: 'cube_resize_mode',
-        render: (value, record) => {
-          const blocked = this.unusableReason(record);
-          if (blocked) {
-            return blocked;
-          }
-          const why = this.liveResizeReason(record);
-          return why === null
-            ? t('LIVE - no reboot')
-            : `${t('COLD - restarts the instance')}: ${why}`;
-        },
+        width: 110,
+        render: (value, record) => this.renderModeIcon(record),
       },
     ];
   }
