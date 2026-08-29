@@ -29,6 +29,7 @@ import {
   isIronicInstance,
   isBootFromVolume,
 } from 'resources/nova/instance';
+import { checkPolicyRule } from 'resources/skyline/policy';
 import FlavorSelectTable from '../components/FlavorSelectTable';
 import {
   fetchQuota,
@@ -81,7 +82,7 @@ const getHeadroom = (flavorInfo) => {
 export class LiveResize extends ModalAction {
   static id = 'live-resize';
 
-  static title = t('Live Resize');
+  static title = t('Resize');
 
   init() {
     this.store = globalFlavorStore;
@@ -105,7 +106,7 @@ export class LiveResize extends ModalAction {
   }
 
   get name() {
-    return t('live resize');
+    return t('resize');
   }
 
   static get modalSize() {
@@ -138,12 +139,25 @@ export class LiveResize extends ModalAction {
     };
   }
 
-  static policy = 'os_compute_api:servers:live_resize';
+  // Either right opens the dialog; which one is enforced depends on the mode
+  // the operator picks. Gating on live_resize alone hid the whole dialog from a
+  // tenant who can cold-resize their own instance, undoing the policy split the
+  // API deliberately supports.
+  static policy = {
+    rules: [
+      'os_compute_api:servers:live_resize',
+      'os_compute_api:servers:resize',
+    ],
+    every: false,
+  };
+
+  static canLiveResize = () =>
+    checkPolicyRule('os_compute_api:servers:live_resize');
 
   static allowed = (item, containerProps) => {
     const { isAdminPage } = containerProps;
     return Promise.resolve(
-      checkStatus(['active'], item, false) &&
+      checkStatus(['active', 'shutoff'], item, false) &&
         isNotLockedOrAdmin(item, isAdminPage) &&
         !isIronicInstance(item)
     );
@@ -182,6 +196,12 @@ export class LiveResize extends ModalAction {
     // promise LIVE on that; cubecmp badges the same case COLD.
     if (!plan) {
       return t('Live resize is unavailable on this cluster');
+    }
+    if (!checkStatus(['active'], this.item, false)) {
+      return t('Instance is not running');
+    }
+    if (!LiveResize.canLiveResize()) {
+      return t('You do not have permission to live resize');
     }
     const current = this.item.flavor_info || {};
     const { vcpus: curVcpus, ram: curRam, disk: curDisk } = current;
@@ -328,7 +348,32 @@ export class LiveResize extends ModalAction {
           },
         },
       },
+      // Downtime is consented to, never inferred. The box appears only when the
+      // chosen flavor resolves to COLD, so a live grow is not made to feel
+      // dangerous and a restart is never a surprise.
+      ...(this.selectedIsCold
+        ? [
+            {
+              name: 'coldConsent',
+              label: t('Forced Shutdown'),
+              type: 'check',
+              content: t('Agree to restart the instance'),
+              required: true,
+              validator: (rule, value) =>
+                value === true
+                  ? Promise.resolve()
+                  : Promise.reject(
+                      new Error(t('Force shutdown must be checked!'))
+                    ),
+            },
+          ]
+        : []),
     ];
+  }
+
+  get selectedIsCold() {
+    const { flavor } = this.state;
+    return !!flavor && this.resizeMode(flavor) === 'cold';
   }
 
   onSubmit = (values) => {

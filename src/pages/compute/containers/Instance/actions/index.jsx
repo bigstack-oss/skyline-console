@@ -32,7 +32,6 @@ import SuspendAction from './Suspend';
 import ResumeAction from './Resume';
 import AttachVolume from './AttachVolume';
 import DetachVolume from './DetachVolume';
-import Resize from './Resize';
 import LiveResize from './LiveResize';
 import MigrateAction from './Migrate';
 import Console from './Console';
@@ -81,7 +80,10 @@ const resourceActions = [
 const configActions = [
   ConfirmResize,
   RevertResize,
-  Resize,
+  // One resize action. LiveResize resolves LIVE vs COLD per flavor and asks the
+  // operator to consent to a restart, so the separate cold-only Resize is gone.
+  // ConfirmResize / RevertResize stay -- the cold path still lands in
+  // VERIFY_RESIZE and needs clearing.
   LiveResize,
   ChangePassword,
   Rebuild,
