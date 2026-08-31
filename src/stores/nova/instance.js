@@ -424,6 +424,23 @@ export class ServerStore extends Base {
   }
 
   @action
+  async getResizePlan(id) {
+    const result = await this.client.resizePlan.list(id);
+    return result.resize_plan || result;
+  }
+
+  @action
+  async cubeResize({ id, flavor, mode }) {
+    const body = {
+      'cube-resize': {
+        flavorRef: flavor,
+        mode,
+      },
+    };
+    return this.operation({ body, id });
+  }
+
+  @action
   async liveResize({ id, flavor }) {
     const body = {
       'live-resize': {
