@@ -91,11 +91,8 @@ export class LiveResize extends ModalAction {
     this.fetchPlan();
   }
 
-  // The instance's real hotplug ceiling, boot source and current shape, in one
-  // call. Until it arrives -- and for instances booted before the ceiling was
-  // recorded -- we fall back to the config-derived estimate, which is wrong
-  // whenever the flavor carried an hw:max_* override. plan.ceiling_is_exact
-  // says which one we are looking at.
+  // Ceiling, boot source and current shape in one call. Falls back to the
+  // config-derived estimate; plan.ceiling_is_exact says which one this is.
   async fetchPlan() {
     try {
       const plan = await globalServerStore.getResizePlan(this.item.id);
@@ -207,12 +204,8 @@ export class LiveResize extends ModalAction {
     const { vcpus: curVcpus, ram: curRam, disk: curDisk } = current;
     const { vcpus, ram, disk } = flavor || {};
     const { maxVcpus, maxRam } = this.headroom;
-    // The plan could not read a ceiling off the instance and fell back to one
-    // computed from config, which tracks the current headroom-factor tuning
-    // rather than what the running domain was actually built with. Anything
-    // booted before the headroom patch has no ceiling in its XML at all, so
-    // the driver refuses a live resize there whatever the estimate says.
-    // Never promise LIVE on a guess; a hard reboot records the real ceiling.
+    // Config-derived estimate, not the domain's real ceiling -- never promise
+    // LIVE on a guess. Clears on the instance's next hard reboot.
     if (plan && plan.ceiling_is_exact === false) {
       return t('This instance has no recorded hotplug ceiling yet');
     }
