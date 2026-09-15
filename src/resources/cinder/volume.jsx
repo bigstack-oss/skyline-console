@@ -21,9 +21,11 @@ import ImportStatus from 'components/ImportStatus';
 import globalProjectStore from 'stores/keystone/project';
 import globalVolumeStore from 'stores/cinder/volume';
 import { yesNoOptions } from 'utils/constants';
-import { renderFilterMap } from 'utils/index';
+import { formatSize, renderFilterMap } from 'utils/index';
 import { idNameColumn } from 'utils/table';
 import { computeSizeMiB, getProgressBarColorByStatus } from 'utils/image';
+import UsageBar from 'components/UsageBar';
+import { getVolumeUsage } from 'resources/prometheus/volumeUsage';
 import styles from './volume-table.less';
 
 export const volumeStatus = {
@@ -461,6 +463,35 @@ export const getCosVolumeColumnsList = (self) => {
       dataIndex: 'volumeSize',
       sorter: false,
       render: (value) => computeSizeMiB(value),
+    },
+    {
+      title: t('Allocated'),
+      dataIndex: 'usage',
+      isHideable: true,
+      sorter: false,
+      width: 170,
+      render: (_, row) => {
+        const { percent, allocated, provisioned } = getVolumeUsage(
+          self.usage || {},
+          row.volumeId || row.id
+        );
+        return (
+          <UsageBar
+            value={percent}
+            tip={
+              percent === undefined
+                ? null
+                : t(
+                    '{allocated} of {provisioned} physically allocated in the pool. Thin volumes keep blocks once written, so this does not fall when files are deleted in the guest.',
+                    {
+                      allocated: formatSize(allocated),
+                      provisioned: formatSize(provisioned),
+                    }
+                  )
+            }
+          />
+        );
+      },
     },
     {
       title: t('Status'),
