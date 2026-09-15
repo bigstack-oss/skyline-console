@@ -78,11 +78,16 @@ export class Instance extends Base {
         <UsageBar
           label={t('DISK')}
           value={disk.value}
-          estimated={disk.estimated}
+          blockLevel={disk.blockLevel}
           tip={
-            disk.estimated
+            // eslint-disable-next-line no-nested-ternary
+            disk.value === undefined
               ? t(
-                  'Allocated block storage, not filesystem usage: blocks stay allocated after being written, so this reads high. Install qemu-guest-agent in the instance to report actual filesystem usage.'
+                  'No usage reported. The storage backend does not report per-disk allocation, and the instance has no qemu-guest-agent answering.'
+                )
+              : disk.blockLevel
+              ? t(
+                  'Allocated block storage, not filesystem usage: blocks stay allocated after being written, so this reads high and does not fall when files are deleted. Install qemu-guest-agent in the instance to report actual filesystem usage.'
                 )
               : null
           }
@@ -226,7 +231,8 @@ export class Instance extends Base {
         dataIndex: 'usage',
         isHideable: true,
         sorter: false,
-        width: 190,
+        // label + tag slot + bar + percentage
+        width: 260,
         render: (_, row) => this.renderUsage(row),
       },
       {

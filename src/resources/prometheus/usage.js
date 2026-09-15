@@ -14,9 +14,8 @@
 
 import client from 'client/skyline';
 
-// Shared by the instance and volume lists. Each page issues one instant query
-// per metric -- returning every row at once -- rather than one query per table
-// row, which would be a request per instance on every render.
+// Shared by the instance and volume lists. One instant query per metric
+// returns every row at once, rather than a request per table row.
 
 // Collapses a Prometheus vector into { <labelValue>: number }, keyed by the
 // label the calling page joins on.
@@ -49,14 +48,6 @@ export const fetchUsageMaps = async (queries, key) => {
     return acc;
   }, {});
 };
-
-// Grey, because an estimate is not on the alert scale. RBD keeps a block
-// allocated once written unless the guest passes TRIM through, so allocation
-// runs far ahead of filesystem usage -- 85% allocated against 14.8% used on a
-// measured instance. Colouring that red would flag an idle instance, and the
-// disk alert cannot fire for it anyway: tpl_alert_vm_disk.tick streams guest
-// filesystem readings, which is exactly what these rows lack.
-export const ESTIMATED_COLOR = '#bfbfbf';
 
 // Boundaries match tpl_alert_vm_disk.tick: normal below 50, informational from
 // 75, warning from 85, critical from 95. The bar collapses warn and crit into

@@ -14,31 +14,60 @@
 
 import { fetchUsageMaps } from './usage';
 
-// How much of a thin-provisioned volume the pool has actually had to allocate.
-// There is no guest reading here: a volume is a block device, and nothing maps
-// one back to a guest mountpoint, so allocation is the only per-volume figure.
+// Guest filesystem usage per volume, with block allocation behind it. The
+// collector keys the rollup off the volume uuid in the disk serial; an
+// unattached or agentless volume has no guest reading and falls back.
 const QUERIES = {
+  guestUsed: 'sum by (volume) (cube_volume_guest_used_bytes)',
+  guestTotal: 'sum by (volume) (cube_volume_guest_total_bytes)',
   allocated:
     'sum by (disk_id) (cube_storage_disk_allocated_bytes{kind="volume"})',
   provisioned:
     'sum by (disk_id) (cube_storage_disk_provisioned_bytes{kind="volume"})',
 };
 
-export const fetchVolumeUsage = () => fetchUsageMaps(QUERIES, 'disk_id');
+// Two label names on purpose: the guest series are keyed by volume uuid, the
+// block series by the rbd image name, which is the uuid with a volume- prefix.
+export const fetchVolumeUsage = async () => {
+  const [guest, block] = await Promise.all([
+    fetchUsageMaps(
+      { guestUsed: QUERIES.guestUsed, guestTotal: QUERIES.guestTotal },
+      'volume'
+    ),
+    fetchUsageMaps(
+      { allocated: QUERIES.allocated, provisioned: QUERIES.provisioned },
+      'disk_id'
+    ),
+  ]);
+  return { ...guest, ...block };
+};
 
-// The collector names an rbd image `volume-<uuid>`; the table row carries the
-// bare uuid.
+// Guest filesystem first, block allocation second. `blockLevel` tells the
+// renderer to tag the row, because allocation is not usage: blocks stay
+// allocated once written, so it runs ahead and never falls.
 export const getVolumeUsage = (usage, id) => {
+  const used = (usage.guestUsed || {})[id];
+  const total = (usage.guestTotal || {})[id];
+  if (used !== undefined && total) {
+    return {
+      percent: (100 * used) / total,
+      used,
+      total,
+      blockLevel: false,
+    };
+  }
+
   const key = `volume-${id}`;
   const allocated = (usage.allocated || {})[key];
   const provisioned = (usage.provisioned || {})[key];
-  if (allocated === undefined || !provisioned) {
-    return { percent: undefined };
+  if (allocated !== undefined && provisioned) {
+    return {
+      percent: (100 * allocated) / provisioned,
+      used: allocated,
+      total: provisioned,
+      blockLevel: true,
+    };
   }
 
-  return {
-    percent: (100 * allocated) / provisioned,
-    allocated,
-    provisioned,
-  };
+  return { percent: undefined };
 };

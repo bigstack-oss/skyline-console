@@ -465,29 +465,39 @@ export const getCosVolumeColumnsList = (self) => {
       render: (value) => computeSizeMiB(value),
     },
     {
-      title: t('Allocated'),
+      title: t('Disk Usage'),
       dataIndex: 'usage',
       isHideable: true,
       sorter: false,
-      width: 170,
+      width: 230,
       render: (_, row) => {
-        const { percent, allocated, provisioned } = getVolumeUsage(
+        const { percent, used, total, blockLevel } = getVolumeUsage(
           self.usage || {},
           row.volumeId || row.id
         );
+        if (percent === undefined) {
+          return (
+            <UsageBar
+              tip={t(
+                'No usage reported. The storage backend does not report per-volume allocation, and no instance running qemu-guest-agent has this volume attached.'
+              )}
+            />
+          );
+        }
         return (
           <UsageBar
             value={percent}
+            blockLevel={blockLevel}
             tip={
-              percent === undefined
-                ? null
-                : t(
-                    '{allocated} of {provisioned} physically allocated in the pool. Thin volumes keep blocks once written, so this does not fall when files are deleted in the guest.',
-                    {
-                      allocated: formatSize(allocated),
-                      provisioned: formatSize(provisioned),
-                    }
+              blockLevel
+                ? t(
+                    '{used} of {total} physically allocated in the pool. This is not filesystem usage: blocks stay allocated once written, so it reads high and does not fall when files are deleted. Attach the volume to an instance running qemu-guest-agent to report actual usage.',
+                    { used: formatSize(used), total: formatSize(total) }
                   )
+                : t('{used} used of {total} reported by the guest filesystem', {
+                    used: formatSize(used),
+                    total: formatSize(total),
+                  })
             }
           />
         );
