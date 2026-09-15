@@ -14,13 +14,10 @@
 
 import { fetchUsageMaps } from './usage';
 
-// Disk has two sources. `disk` is what the guest filesystem reports, which only
-// exists for instances whose qemu-guest-agent answers. `diskAllocated` is the
-// block layer's view and exists for every instance, so it backs the rows the
-// agent cannot answer for. The two measure different things -- blocks stay
-// allocated after being written, so allocation runs ahead of filesystem usage
-// and never comes back down -- so a fallback row is marked as an estimate
-// rather than presented as the same number.
+// Disk has two sources: what the guest filesystem reports, and the block
+// layer behind it for instances whose agent does not answer. They measure
+// different things, so a fallback row is tagged rather than presented as the
+// same number.
 const QUERIES = {
   cpu: 'clamp_max(rate(ceilometer_cpu[5m]) / 1e7 / ceilometer_vcpus, 100)',
   memory:
@@ -32,16 +29,16 @@ const QUERIES = {
 
 export const fetchInstanceUsage = () => fetchUsageMaps(QUERIES, 'resource');
 
-// Guest filesystem first, block allocation second. `estimated` tells the
-// renderer to mark the value, because the fallback is not filesystem usage.
+// Guest filesystem first, block allocation second. `blockLevel` tells the
+// renderer to tag the value, because the fallback is not filesystem usage.
 export const getDiskUsage = (usage, id) => {
   const exact = (usage.disk || {})[id];
   if (exact !== undefined) {
-    return { value: exact, estimated: false };
+    return { value: exact, blockLevel: false };
   }
   const allocated = (usage.diskAllocated || {})[id];
   if (allocated !== undefined) {
-    return { value: allocated, estimated: true };
+    return { value: allocated, blockLevel: true };
   }
-  return { value: undefined, estimated: false };
+  return { value: undefined, blockLevel: false };
 };
