@@ -65,7 +65,7 @@ const actionConfigs = {
       },
     ],
   },
-  batchActions: [Delete],
+  batchActions: [ChangeType, Delete],
   primaryActions: [Create, AcceptVolumeTransfer],
 };
 
@@ -99,11 +99,14 @@ const adminConfig = {
         action: UpdateStatus,
       },
       {
+        action: ChangeType,
+      },
+      {
         action: Migrate,
       },
     ],
   },
-  batchActions: [Delete],
+  batchActions: [ChangeType, Delete],
   primaryActions: [],
 };
 
