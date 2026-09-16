@@ -25,6 +25,7 @@ import cosVolumeStore from 'stores/cos/volume';
 import { SnapshotVolumeStore } from 'stores/cinder/snapshot-volume';
 import { InstanceVolumeStore } from 'stores/nova/instance-volume';
 import { emptyActionConfig } from 'utils/constants';
+import { fetchVolumeUsage } from 'resources/prometheus/volumeUsage';
 import actionConfigs from './actions';
 
 export class Volume extends BaseList {
@@ -95,6 +96,18 @@ export class Volume extends BaseList {
 
   get defaultSortKey() {
     return 'created_at';
+  }
+
+  // Pool allocation is not part of the cinder response, so it is fetched once
+  // from Prometheus and looked up per row rather than requested per volume.
+  usage = {};
+
+  componentDidMount() {
+    super.componentDidMount();
+    fetchVolumeUsage().then((usage) => {
+      this.usage = usage;
+      this.forceUpdate();
+    });
   }
 
   getColumns = () => {

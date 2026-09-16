@@ -21,9 +21,11 @@ import ImportStatus from 'components/ImportStatus';
 import globalProjectStore from 'stores/keystone/project';
 import globalVolumeStore from 'stores/cinder/volume';
 import { yesNoOptions } from 'utils/constants';
-import { renderFilterMap } from 'utils/index';
+import { formatSize, renderFilterMap } from 'utils/index';
 import { idNameColumn } from 'utils/table';
 import { computeSizeMiB, getProgressBarColorByStatus } from 'utils/image';
+import UsageBar from 'components/UsageBar';
+import { getVolumeUsage } from 'resources/prometheus/volumeUsage';
 import styles from './volume-table.less';
 
 export const volumeStatus = {
@@ -461,6 +463,45 @@ export const getCosVolumeColumnsList = (self) => {
       dataIndex: 'volumeSize',
       sorter: false,
       render: (value) => computeSizeMiB(value),
+    },
+    {
+      title: t('Disk Usage'),
+      dataIndex: 'usage',
+      isHideable: true,
+      sorter: false,
+      width: 230,
+      render: (_, row) => {
+        const { percent, used, total, blockLevel } = getVolumeUsage(
+          self.usage || {},
+          row.volumeId || row.id
+        );
+        if (percent === undefined) {
+          return (
+            <UsageBar
+              tip={t(
+                'No usage reported. The storage backend does not report per-volume allocation, and no instance running qemu-guest-agent has this volume attached.'
+              )}
+            />
+          );
+        }
+        return (
+          <UsageBar
+            value={percent}
+            blockLevel={blockLevel}
+            tip={
+              blockLevel
+                ? t(
+                    '{used} of {total} physically allocated in the pool. This is not filesystem usage: blocks stay allocated once written, so it reads high and does not fall when files are deleted. Attach the volume to an instance running qemu-guest-agent to report actual usage.',
+                    { used: formatSize(used), total: formatSize(total) }
+                  )
+                : t('{used} used of {total} reported by the guest filesystem', {
+                    used: formatSize(used),
+                    total: formatSize(total),
+                  })
+            }
+          />
+        );
+      },
     },
     {
       title: t('Status'),

@@ -28,6 +28,11 @@ import { ServerGroupInstanceStore } from 'stores/skyline/server-group-instance';
 import { CubeCopyButton } from 'components/cube/CubeCopyButton/CubeCopyButton';
 import { Tooltip } from 'antd';
 import { Link } from 'react-router-dom';
+import {
+  fetchInstanceUsage,
+  getDiskUsage,
+} from 'resources/prometheus/instanceUsage';
+import UsageBar from 'components/UsageBar';
 import actionConfigs from './actions';
 import styles from './instance-table.less';
 
@@ -48,6 +53,49 @@ const PlainTag = (props) => {
 };
 
 export class Instance extends Base {
+  // Usage is not part of the Nova response, so it is fetched once from
+  // Prometheus and looked up per row rather than requested per instance. A
+  // plain field rather than an observable: no other page container in this
+  // codebase uses mobx decorators, and one fetch needs no finer reactivity.
+  usage = { cpu: {}, memory: {}, disk: {} };
+
+  componentDidMount() {
+    super.componentDidMount();
+    fetchInstanceUsage().then((usage) => {
+      this.usage = usage;
+      this.forceUpdate();
+    });
+  }
+
+  // One column, three stacked gauges: the table is already wide, and the three
+  // readings are read together rather than compared across rows.
+  renderUsage(row) {
+    const disk = getDiskUsage(this.usage, row.id);
+    return (
+      <div className={styles['usage-stack']}>
+        <UsageBar label={t('CPU')} value={(this.usage.cpu || {})[row.id]} />
+        <UsageBar label={t('MEM')} value={(this.usage.memory || {})[row.id]} />
+        <UsageBar
+          label={t('DISK')}
+          value={disk.value}
+          blockLevel={disk.blockLevel}
+          tip={
+            // eslint-disable-next-line no-nested-ternary
+            disk.value === undefined
+              ? t(
+                  'No usage reported. The storage backend does not report per-disk allocation, and the instance has no qemu-guest-agent answering.'
+                )
+              : disk.blockLevel
+              ? t(
+                  'Allocated block storage, not filesystem usage: blocks stay allocated after being written, so this reads high and does not fall when files are deleted. Install qemu-guest-agent in the instance to report actual filesystem usage.'
+                )
+              : null
+          }
+        />
+      </div>
+    );
+  }
+
   init() {
     if (!this.inDetailPage) {
       this.store = globalServerStore;
@@ -177,6 +225,15 @@ export class Instance extends Base {
         isDefaultHidden: true,
         hidden: !this.isAdminPage,
         sortKey: 'project_id',
+      },
+      {
+        title: t('Usage'),
+        dataIndex: 'usage',
+        isHideable: true,
+        sorter: false,
+        // label + tag slot + bar + percentage
+        width: 260,
+        render: (_, row) => this.renderUsage(row),
       },
       {
         title: t('Host'),
