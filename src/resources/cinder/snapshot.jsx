@@ -13,16 +13,20 @@
 // limitations under the License.
 
 import globalVolumeTypeStore from 'stores/cinder/volume-type';
+import { filterVolumeTypes } from 'resources/cinder/volume-type';
 import { toJS } from 'mobx';
 import { cloneDeep } from 'lodash';
 
-export const volumeTypes = () => {
-  return (globalVolumeTypeStore.list.data || []).map((it) => ({
+const toVolumeTypeOptions = (types) =>
+  types.map((it) => ({
     label: it.name,
     value: it.id,
     originData: toJS(it),
   }));
-};
+
+// Options for the volume type pickers: hidden types (__DEFAULT__) left out.
+export const volumeTypes = () =>
+  toVolumeTypeOptions(filterVolumeTypes(globalVolumeTypeStore.list.data));
 
 export const getDiskInfo = (detail) => {
   const {
@@ -35,7 +39,11 @@ export const getDiskInfo = (detail) => {
   const deleteTypeLabel = delete_on_termination
     ? t('Deleted with the instance')
     : t('Not deleted with the instance');
-  const volumeTypeItem = volumeTypes().find((it) => it.label === volume_type);
+  // Match against every type, hidden ones included: this describes the
+  // source volume's existing type rather than offering a choice.
+  const volumeTypeItem = toVolumeTypeOptions(
+    globalVolumeTypeStore.list.data || []
+  ).find((it) => it.label === volume_type);
   const diskInfo = {
     type: volumeTypeItem?.value,
     typeOption: volumeTypeItem,

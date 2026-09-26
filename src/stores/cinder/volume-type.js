@@ -24,6 +24,9 @@ export class VolumeTypeStore extends Base {
   @observable
   projectVolumeTypes = [];
 
+  @observable
+  defaultVolumeType = null;
+
   get client() {
     return client.cinder.types;
   }
@@ -200,6 +203,19 @@ export class VolumeTypeStore extends Base {
     }
     await this.removeProjectAccess(id, dels);
     return this.addProjectAccess(id, adds);
+  }
+
+  // Cinder's effective default type for the current project. Not every
+  // role may read it, so any failure just means "no default known".
+  @action
+  async fetchDefaultVolumeType() {
+    try {
+      const { volume_type } = await this.client.getDefault();
+      this.defaultVolumeType = volume_type || null;
+    } catch (e) {
+      this.defaultVolumeType = null;
+    }
+    return this.defaultVolumeType;
   }
 
   @action
