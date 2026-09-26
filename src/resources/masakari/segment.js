@@ -16,3 +16,16 @@
 export const segmentServiceType = 'COMPUTE';
 export const hostType = 'COMPUTE';
 export const hostControlAttributes = 'SSH';
+
+// Masakari's host-create schema is additionalProperties: false, so only the
+// fields it knows may be sent; anything copied from a nova service row
+// (disabled_reason, zone, ...) would make the whole request 400.
+export const getHostCreateBody = ({ name, reserved, on_maintenance }) => ({
+  host: {
+    name,
+    type: hostType,
+    control_attributes: hostControlAttributes,
+    reserved: !!reserved,
+    on_maintenance: !!on_maintenance,
+  },
+});

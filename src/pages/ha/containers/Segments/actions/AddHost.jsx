@@ -14,7 +14,11 @@ import { inject, observer } from 'mobx-react';
 import { ModalAction } from 'src/containers/Action';
 import globalHostStore from 'src/stores/masakari/hosts';
 import globalComputeHostStore from 'src/stores/nova/compute-host';
-import { hostControlAttributes, hostType } from 'resources/masakari/segment';
+import {
+  getHostCreateBody,
+  hostControlAttributes,
+  hostType,
+} from 'resources/masakari/segment';
 
 export class AddHost extends ModalAction {
   init() {
@@ -129,8 +133,7 @@ export class AddHost extends ModalAction {
   }
 
   onSubmit = (values) => {
-    const { segment_name, ...submitData } = values;
-    return this.store.create(this.item.uuid, { host: { ...submitData } });
+    return this.store.create(this.item.uuid, getHostCreateBody(values));
   };
 }
 
