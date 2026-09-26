@@ -25,6 +25,7 @@ import {
   getPasswordOtherRule,
   phoneNumberValidate,
   emailValidate,
+  isEmptyPhoneNumber,
 } from 'utils/validate';
 import {
   statusTypes,
@@ -275,7 +276,6 @@ export class Create extends FormAction {
         name: 'email',
         label: t('Email'),
         type: 'input',
-        required: true,
         validator: emailValidate,
         ...cols,
       },
@@ -291,7 +291,6 @@ export class Create extends FormAction {
         name: 'phone',
         label: t('Phone'),
         type: 'phone',
-        required: true,
         validator: phoneNumberValidate,
         ...cols,
       },
@@ -324,7 +323,6 @@ export class Create extends FormAction {
         name: 'real_name',
         label: t('Real Name'),
         type: 'input',
-        required: true,
         ...cols,
         maxLength: 30,
       },
@@ -366,9 +364,18 @@ export class Create extends FormAction {
 
   onSubmit = async (values) => {
     const { projectRoles } = this.state;
-    values.defaultRole = this.projectRoleList[0].id;
+    values.defaultRole = (this.projectRoleList[0] || {}).id;
     values.projectRoles = projectRoles;
     const { confirmPassword, more, ...rest } = values;
+    // Optional attributes left blank are not sent at all.
+    ['email', 'real_name'].forEach((key) => {
+      if (!(rest[key] || '').trim()) {
+        delete rest[key];
+      }
+    });
+    if (isEmptyPhoneNumber(rest.phone)) {
+      delete rest.phone;
+    }
     return this.store.create(rest);
   };
 }
