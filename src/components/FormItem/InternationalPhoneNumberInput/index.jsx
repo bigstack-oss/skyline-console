@@ -58,6 +58,6 @@ export default function InternationalPhoneNumberInput({
 }
 
 InternationalPhoneNumberInput.defaultProps = {
-  value: '+86 ',
+  value: '+886 ',
   options: defaultCountries,
 };

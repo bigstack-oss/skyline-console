@@ -99,6 +99,20 @@ export const isDatabaseUserName = (value) => {
 
 export const isPhoneNumber = (value) => isValidPhoneNumber(value);
 
+// The phone input emits "<+calling code> <number>", so a country code with
+// no number typed after it is an empty phone, not an invalid one.
+export const isEmptyPhoneNumber = (value) => {
+  if (!value || !value.trim()) {
+    return true;
+  }
+  const index = value.indexOf(' ');
+  return (
+    index >= 0 &&
+    /^\+?\d*$/.test(value.slice(0, index)) &&
+    !value.slice(index + 1).trim()
+  );
+};
+
 export const isEmailNumber = (value) => emailRegex.test(value);
 
 export const isMacAddress = (value) => macRegex.test(value);
@@ -411,7 +425,7 @@ export const databaseUserNameValidate = (rule, value) => {
 };
 
 export const phoneNumberValidate = (rule, value) => {
-  if (!rule.required && !value) {
+  if (!rule.required && isEmptyPhoneNumber(value)) {
     return Promise.resolve(true);
   }
   if (isPhoneNumber(value)) {
