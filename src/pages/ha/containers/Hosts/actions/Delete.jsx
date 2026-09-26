@@ -34,7 +34,7 @@ export default class Delete extends ConfirmAction {
     return true;
   }
 
-  policy = 'instance:delete';
+  policy = 'os_masakari_api:os-hosts:delete';
 
   allowedCheckFunction = () => true;
 

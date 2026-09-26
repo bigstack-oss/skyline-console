@@ -62,6 +62,7 @@ export const policyMap = {
     'ipsec_site_connection',
   ],
   octavia: ['os_load-balancer_api'],
+  masakari: ['os_masakari_api'],
   // keystone: ['identity:'],
   heat: ['stacks:', 'resource:index'],
   magnum: ['cluster:', 'clustertemplate:'],

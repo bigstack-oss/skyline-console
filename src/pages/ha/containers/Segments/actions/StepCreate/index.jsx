@@ -40,7 +40,10 @@ export class StepCreate extends StepAction {
     this.failedHosts = [];
   }
 
-  static policy = 'get_images';
+  static policy = [
+    'os_masakari_api:segments:create',
+    'os_masakari_api:os-hosts:create',
+  ];
 
   static allowed() {
     return Promise.resolve(true);
