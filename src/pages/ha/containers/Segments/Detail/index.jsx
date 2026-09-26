@@ -31,7 +31,7 @@ export class SegmentsDetail extends Base {
   }
 
   get policy() {
-    return 'capsule:get_one_all_projects';
+    return 'os_masakari_api:segments:detail';
   }
 
   get actionConfigs() {

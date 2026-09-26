@@ -37,7 +37,7 @@ export class AddHost extends ModalAction {
     return t('Add Host');
   }
 
-  static policy = 'baremetal:port:create';
+  static policy = 'os_masakari_api:os-hosts:create';
 
   static allowed = () => Promise.resolve(true);
 

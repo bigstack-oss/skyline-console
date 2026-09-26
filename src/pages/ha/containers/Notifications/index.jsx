@@ -26,10 +26,7 @@ export class Notifications extends Base {
   }
 
   get policy() {
-    if (this.isAdminPage) {
-      return 'os_compute_api:servers:index:get_all_tenants';
-    }
-    return 'os_compute_api:servers:index';
+    return 'os_masakari_api:notifications:index';
   }
 
   get name() {

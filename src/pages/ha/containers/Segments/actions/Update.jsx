@@ -27,7 +27,7 @@ export class Update extends ModalAction {
     return t('Update Segment');
   }
 
-  static policy = 'baremetal:port:Update';
+  static policy = 'os_masakari_api:segments:update';
 
   static allowed = () => Promise.resolve(true);
 

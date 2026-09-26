@@ -34,7 +34,7 @@ export default class Delete extends ConfirmAction {
     return true;
   }
 
-  policy = 'os_compute_api:os-deferred-delete:force';
+  policy = 'os_masakari_api:segments:delete';
 
   allowedCheckFunction = () => true;
 
