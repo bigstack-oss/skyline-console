@@ -30,7 +30,7 @@ export class Notifications extends Base {
   }
 
   get name() {
-    return t('segments');
+    return t('notifications');
   }
 
   get defaultSortKey() {
@@ -49,7 +49,7 @@ export class Notifications extends Base {
     return [
       {
         label: t('Host'),
-        name: 'source_host_uuid',
+        name: 'source_host_name',
       },
       {
         label: t('UUID'),
@@ -72,8 +72,9 @@ export class Notifications extends Base {
     },
     {
       title: t('Host'),
-      dataIndex: 'source_host_uuid',
+      dataIndex: 'source_host_name',
       isHideable: true,
+      render: (value, row) => value || row.source_host_uuid,
     },
     {
       title: t('Type'),

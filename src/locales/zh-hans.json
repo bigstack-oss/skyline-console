@@ -3138,6 +3138,7 @@
   "networks": "网络",
   "neutron agent": "网络服务",
   "neutron agents": "网络服务",
+  "notifications": "通知",
   "ns1.example.com admin.example.com 2013022001 86400 7200 604800 300 <ul><li>The primary name server for the domain, which is ns1.example.com or the first name server in the vanity name server list.</li><li>The responsible party for the domain: admin.example.com.</li><li>A timestamp that changes whenever you update your domain.</li><li>The number of seconds before the zone should be refreshed.</li><li>The number of seconds before a failed refresh should be retried.</li><li>The upper limit in seconds before a zone is considered no longer authoritative.</li><li>The negative result TTL (for example, how long a resolver should consider a negative result for a subdomain to be valid before retrying).</li></ul>": "ns1.example.com admin.example.com 2013022001 86400 7200 604800 300 <ul><li>域的主名称服务器，即 ns1.example.com 或名称服务器列表中的第一个名称服务器。</li><li>域的负责方：admin.example.com。</li><li>每当您更新域时都会更改的时间戳。</li><li>区域刷新前的秒数。</li><li>刷新失败之前应该重试的秒数。</li><li>区域被视为不再具有权威性之前的秒数上限。</li><li> 否定结果 TTL（例如，在重新尝试之前，解析器应该在多长时间内认为子域的否定结果有效）。</li></ul>",
   "open external gateway": "开启公网网关",
   "out": "出",

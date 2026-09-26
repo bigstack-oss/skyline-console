@@ -47,7 +47,7 @@ export class BaseDetail extends Base {
     ];
 
     return {
-      title: t('Capsule Type'),
+      title: t('Base Info'),
       options,
     };
   }

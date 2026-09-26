@@ -3138,6 +3138,7 @@
   "networks": "сети",
   "neutron agent": "агент Neutron",
   "neutron agents": "агенты Neutron",
+  "notifications": "",
   "ns1.example.com admin.example.com 2013022001 86400 7200 604800 300 <ul><li>The primary name server for the domain, which is ns1.example.com or the first name server in the vanity name server list.</li><li>The responsible party for the domain: admin.example.com.</li><li>A timestamp that changes whenever you update your domain.</li><li>The number of seconds before the zone should be refreshed.</li><li>The number of seconds before a failed refresh should be retried.</li><li>The upper limit in seconds before a zone is considered no longer authoritative.</li><li>The negative result TTL (for example, how long a resolver should consider a negative result for a subdomain to be valid before retrying).</li></ul>": "",
   "open external gateway": "открыть внешний шлюз",
   "out": "выход",
