@@ -15,6 +15,7 @@
 import { inject, observer } from 'mobx-react';
 import { ModalAction } from 'containers/Action';
 import globalVolumeStore from 'stores/cinder/volume';
+import globalVolumeTypeStore from 'stores/cinder/volume-type';
 import globalRootStore from 'stores/root';
 import {
   getQuotaInfo,
@@ -22,7 +23,9 @@ import {
   fetchQuota,
   onVolumeSizeChange,
   onVolumeTypeChange,
+  setCreateVolumeType,
 } from 'resources/cinder/volume';
+import { getPreferredVolumeType } from 'resources/cinder/volume-type';
 
 export class CreateVolume extends ModalAction {
   static id = 'create';
@@ -45,8 +48,19 @@ export class CreateVolume extends ModalAction {
     );
   };
 
-  getVolumeTypes() {
-    this.volumeStore.fetchVolumeTypes();
+  async getVolumeTypes() {
+    const [, clusterDefault] = await Promise.all([
+      this.volumeStore.fetchVolumeTypes(),
+      globalVolumeTypeStore.fetchDefaultVolumeType(),
+    ]);
+    const preferred = getPreferredVolumeType(
+      this.volumeStore.originalVolumeTypes,
+      clusterDefault
+    );
+    if (preferred) {
+      setCreateVolumeType(preferred.name);
+      this.updateFormValue('volume_type', preferred.id);
+    }
   }
 
   get volumeTypes() {
