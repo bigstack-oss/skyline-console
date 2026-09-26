@@ -34,6 +34,7 @@ import {
 import Base from 'components/Form';
 import InstanceVolume from 'components/FormItem/InstanceVolume';
 import { isGpuCategory } from 'resources/nova/flavor';
+import { getPreferredVolumeType } from 'resources/cinder/volume-type';
 import {
   volumeTypes,
   getDiskInfo,
@@ -156,6 +157,7 @@ export class BaseStep extends Base {
     const data = {
       size: 10,
       deleteType: 0,
+      type: this.state.preferredVolumeTypeId,
     };
     return data;
   }
@@ -217,7 +219,12 @@ export class BaseStep extends Base {
 
   async getVolumeTypes() {
     if (this.enableCinder) {
-      await this.volumeTypeStore.fetchList();
+      const [types, clusterDefault] = await Promise.all([
+        this.volumeTypeStore.fetchList(),
+        this.volumeTypeStore.fetchDefaultVolumeType(),
+      ]);
+      const preferred = getPreferredVolumeType(types, clusterDefault);
+      this.setState({ preferredVolumeTypeId: preferred?.id });
     }
   }
 
@@ -827,11 +834,7 @@ export class BaseStep extends Base {
         label: t('System Disk'),
         type: 'instance-volume',
         options: this.volumeTypes,
-        defaultOptionValue: this.volumeTypeStore.list?.isLoading
-          ? undefined
-          : this.volumeTypes.find(
-              (option) => option.label?.toLowerCase() === 'cubestorage'
-            )?.value,
+        defaultOptionValue: this.state.preferredVolumeTypeId,
         required: this.showSystemDiskByBootFromVolume,
         hidden: !this.showSystemDiskByBootFromVolume,
         validator: this.checkSystemDisk,
@@ -865,6 +868,7 @@ export class BaseStep extends Base {
         type: 'add-select',
         options: this.volumeTypes,
         defaultItemValue: this.defaultVolumeType,
+        defaultOptionValue: this.state.preferredVolumeTypeId,
         hidden: this.hideDataDisk,
         itemComponent: InstanceVolume,
         minCount: 0,

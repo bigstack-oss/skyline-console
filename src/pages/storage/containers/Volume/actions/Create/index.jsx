@@ -46,7 +46,11 @@ import {
   canImageCreateIronicInstance,
   canImageCreateInstance,
 } from 'resources/glance/image';
-import { volumeTypeSelectProps } from 'resources/cinder/volume-type';
+import {
+  volumeTypeSelectProps,
+  filterVolumeTypes,
+  getPreferredVolumeType,
+} from 'resources/cinder/volume-type';
 import { allSettled } from 'utils';
 import styles from './index.less';
 
@@ -189,7 +193,7 @@ export class Create extends FormAction {
   }
 
   get volumeTypes() {
-    return toJS(this.volumeTypeStore.list.data || []);
+    return filterVolumeTypes(toJS(this.volumeTypeStore.list.data || []));
   }
 
   get backups() {
@@ -227,9 +231,12 @@ export class Create extends FormAction {
   }
 
   async getVolumeTypes() {
-    const types = await this.volumeTypeStore.fetchList();
-    if (types.length > 0) {
-      const defaultType = types[0];
+    const [types, clusterDefault] = await Promise.all([
+      this.volumeTypeStore.fetchList(),
+      this.volumeTypeStore.fetchDefaultVolumeType(),
+    ]);
+    const defaultType = getPreferredVolumeType(types, clusterDefault);
+    if (defaultType) {
       const { id, name } = defaultType;
       const initVolumeType = {
         selectedRowKeys: [id],

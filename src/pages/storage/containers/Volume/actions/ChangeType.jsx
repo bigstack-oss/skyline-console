@@ -17,6 +17,7 @@ import { ModalAction } from 'containers/Action';
 import globalVolumeStore from 'stores/cinder/volume';
 import globalVolumeTypeStore from 'stores/cinder/volume-type';
 import { isAvailableOrInUse, isOsDisk } from 'resources/cinder/volume';
+import { filterVolumeTypes } from 'resources/cinder/volume-type';
 
 export class ChangeType extends ModalAction {
   static id = 'change-type';
@@ -55,7 +56,7 @@ export class ChangeType extends ModalAction {
   get volumeTypes() {
     const { volume_type } = this.item;
     const { data = [] } = this.volumeTypeStore.list;
-    const list = data
+    const list = filterVolumeTypes(data)
       .filter((it) => it.name !== volume_type)
       .map((item) =>
         // TODO: filter no current volume type

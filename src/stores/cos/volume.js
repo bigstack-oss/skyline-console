@@ -3,6 +3,7 @@ import client from 'client';
 import { volumeApi } from 'src/apis/volumeApi';
 import BaseStore from 'stores/base';
 import globalVolumeTypeStore from 'stores/cinder/volume-type';
+import { filterVolumeTypes } from 'resources/cinder/volume-type';
 
 export class CosVolumeStore extends BaseStore {
   @observable
@@ -235,7 +236,9 @@ export class CosVolumeStore extends BaseStore {
 
   @action
   async fetchVolumeTypes(params) {
-    const data = await globalVolumeTypeStore.fetchList(params);
+    const data = filterVolumeTypes(
+      await globalVolumeTypeStore.fetchList(params)
+    );
     this.volumeTypes = data.map((it) => ({
       label: it.name,
       value: it.id,

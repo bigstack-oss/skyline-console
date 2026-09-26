@@ -68,6 +68,36 @@ export const volumeTypeSelectProps = {
   filterParams: volumeTypeFilters,
 };
 
+// Types that exist in Cinder but must never be offered when creating,
+// attaching or retyping a volume. `__DEFAULT__` is Cinder's own placeholder
+// type; CubeCOS always configures a real default_volume_type instead. The
+// admin Volume Types page and quota screens still list every type.
+export const HIDDEN_VOLUME_TYPE_NAMES = ['__DEFAULT__'];
+
+// Picked when Cinder's default type cannot be read (e.g. a policy denies
+// GET /types/default to the user) or is itself hidden.
+export const FALLBACK_VOLUME_TYPE_NAME = 'CubeStorage';
+
+export const isHiddenVolumeType = (type) =>
+  HIDDEN_VOLUME_TYPE_NAMES.includes((type || {}).name);
+
+export const filterVolumeTypes = (types = []) =>
+  (types || []).filter((it) => !isHiddenVolumeType(it));
+
+// The type a picker should preselect: Cinder's configured default, then
+// CubeStorage (case-insensitive), then the first visible type.
+export const getPreferredVolumeType = (types = [], defaultType) => {
+  const visible = filterVolumeTypes(types);
+  const { id, name } = defaultType || {};
+  const fallbackName = FALLBACK_VOLUME_TYPE_NAME.toLowerCase();
+  return (
+    (id && visible.find((it) => it.id === id)) ||
+    (name && visible.find((it) => it.name === name)) ||
+    visible.find((it) => (it.name || '').toLowerCase() === fallbackName) ||
+    visible[0]
+  );
+};
+
 export const hasEncryption = (volume) => {
   const { encryption } = volume || {};
   if (!encryption || isEmpty(encryption)) {

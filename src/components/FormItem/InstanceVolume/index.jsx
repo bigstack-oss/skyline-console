@@ -54,26 +54,20 @@ export default class InstanceVolume extends React.Component {
   }
 
   componentDidMount() {
-    this.triggerChange();
+    // The default may already be known when the field mounts (e.g. on
+    // returning to this step), so componentDidUpdate would never see it.
+    if (!this.applyDefaultOption()) {
+      this.triggerChange();
+    }
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { defaultOptionValue, options, minSize } = this.props;
+    const { defaultOptionValue, minSize } = this.props;
     const { size } = this.state;
 
     // Detecting defaultOptionValue updates
-    // If the defaultOptionValue exists in the options, update the select value
-    if (
-      defaultOptionValue &&
-      defaultOptionValue !== prevProps.defaultOptionValue
-    ) {
-      const optionExists = options.some(
-        (option) => option.value === defaultOptionValue
-      );
-
-      if (optionExists) {
-        this.handleTypeChange(defaultOptionValue);
-      }
+    if (defaultOptionValue !== prevProps.defaultOptionValue) {
+      this.applyDefaultOption();
     }
 
     // Checks both `minSize` and `size` actually changed;
@@ -82,6 +76,22 @@ export default class InstanceVolume extends React.Component {
       this.triggerChange();
     }
   }
+
+  // Select defaultOptionValue if no type is chosen yet and it is one of the
+  // options; never overrides a type the user (or the form value) already set.
+  applyDefaultOption = () => {
+    const { defaultOptionValue, options = [] } = this.props;
+    const { type } = this.state;
+    if (
+      !defaultOptionValue ||
+      type ||
+      !options.some((option) => option.value === defaultOptionValue)
+    ) {
+      return false;
+    }
+    this.handleTypeChange(defaultOptionValue);
+    return true;
+  };
 
   validateVolume = (callback) => {
     const { type, size, minSize } = this.state;

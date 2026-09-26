@@ -52,6 +52,11 @@ export class CinderClient extends Base {
             name: 'getAccess',
             key: 'os-volume-type-access',
           },
+          {
+            name: 'getDefault',
+            key: 'default',
+            isDetail: false,
+          },
         ],
         subResources: [
           {
