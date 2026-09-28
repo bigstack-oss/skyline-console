@@ -15,7 +15,11 @@
 import { inject, observer } from 'mobx-react';
 import { ModalAction } from 'containers/Action';
 import globalUserStore from 'stores/keystone/user';
-import { phoneNumberValidate, emailValidate } from 'utils/validate';
+import {
+  phoneNumberValidate,
+  emailValidate,
+  isEmptyPhoneNumber,
+} from 'utils/validate';
 import parsePhoneNumberFromString from 'libphonenumber-js';
 
 export class EditForm extends ModalAction {
@@ -44,9 +48,13 @@ export class EditForm extends ModalAction {
   get defaultValue() {
     const { name, email, phone, real_name, description, domain, domain_id } =
       this.item;
-    const formattedPhone = parsePhoneNumberFromString(phone || '', 'CN') || {
-      countryCallingCode: '86',
-      nationalNumber: '',
+    // A stored phone that does not parse is kept (whitespace stripped, as
+    // the input splits on it) rather than dropped, so saving an unrelated
+    // change cannot silently clear it; a bare country code counts as none.
+    const rawPhone = (phone || '').replace(/\s+/g, '');
+    const formattedPhone = parsePhoneNumberFromString(rawPhone, 'TW') || {
+      countryCallingCode: '886',
+      nationalNumber: /^\+?\d{0,3}$/.test(rawPhone) ? '' : rawPhone,
     };
     const { countryCallingCode, nationalNumber } = formattedPhone;
     return {
@@ -97,20 +105,17 @@ export class EditForm extends ModalAction {
         label: t('Email'),
         type: 'input',
         validator: emailValidate,
-        required: true,
       },
       {
         name: 'phone',
         label: t('Phone'),
         type: 'phone',
-        required: true,
         validator: phoneNumberValidate,
       },
       {
         name: 'real_name',
         label: t('Real Name'),
         type: 'input',
-        required: true,
       },
       {
         name: 'domainName',
@@ -127,12 +132,25 @@ export class EditForm extends ModalAction {
   }
 
   onSubmit = (values) => {
-    const { email, phone, real_name, description, name } = values;
+    const { description, name } = values;
     const { id } = this.item;
+    // A blank optional attribute is omitted; if the user had one stored, it
+    // is cleared with null (Keystone keeps extra attributes it is not sent).
+    const optional = {
+      email: !(values.email || '').trim(),
+      phone: isEmptyPhoneNumber(values.phone),
+      real_name: !(values.real_name || '').trim(),
+    };
+    const attributes = {};
+    Object.keys(optional).forEach((key) => {
+      if (!optional[key]) {
+        attributes[key] = values[key];
+      } else if (this.item[key]) {
+        attributes[key] = null;
+      }
+    });
     return globalUserStore.edit(id, {
-      email,
-      phone,
-      real_name,
+      ...attributes,
       description,
       name,
     });
