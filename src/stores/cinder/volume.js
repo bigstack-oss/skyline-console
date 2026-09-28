@@ -219,7 +219,12 @@ export class VolumeStore extends Base {
 
   @action
   async fetchVolumeTypes(params) {
-    const data = await globalVolumeTypeStore.fetchList(params);
+    // Required lazily: resources/cinder/volume-type imports
+    // resources/cinder/volume, which imports this store.
+    const { filterVolumeTypes } = require('resources/cinder/volume-type');
+    const data = filterVolumeTypes(
+      await globalVolumeTypeStore.fetchList(params)
+    );
     this.volumeTypes = data.map((it) => ({
       label: it.name,
       value: it.id,
