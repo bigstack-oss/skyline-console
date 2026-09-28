@@ -12,6 +12,7 @@
 
 import { inject, observer } from 'mobx-react';
 import Base from 'components/Form';
+import { segmentServiceType } from 'resources/masakari/segment';
 
 export class StepSegment extends Base {
   get title() {
@@ -29,7 +30,7 @@ export class StepSegment extends Base {
   get defaultValue() {
     return {
       recovery_method: 'auto',
-      service_type: 'compute',
+      service_type: segmentServiceType,
     };
   }
 

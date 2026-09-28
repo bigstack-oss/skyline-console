@@ -14,6 +14,11 @@ import { inject, observer } from 'mobx-react';
 import { ModalAction } from 'src/containers/Action';
 import globalHostStore from 'src/stores/masakari/hosts';
 import globalComputeHostStore from 'src/stores/nova/compute-host';
+import {
+  getHostCreateBody,
+  hostControlAttributes,
+  hostType,
+} from 'resources/masakari/segment';
 
 export class AddHost extends ModalAction {
   init() {
@@ -32,7 +37,7 @@ export class AddHost extends ModalAction {
     return t('Add Host');
   }
 
-  static policy = 'baremetal:port:create';
+  static policy = 'os_masakari_api:os-hosts:create';
 
   static allowed = () => Promise.resolve(true);
 
@@ -75,6 +80,8 @@ export class AddHost extends ModalAction {
     return {
       segment_name: this.item.name,
       reserved: false,
+      type: hostType,
+      control_attributes: hostControlAttributes,
       on_maintenance: false,
     };
   }
@@ -106,12 +113,14 @@ export class AddHost extends ModalAction {
         label: t('Type'),
         type: 'input',
         required: true,
+        disabled: true,
       },
       {
         name: 'control_attributes',
         label: t('Control Attributes'),
         type: 'input',
         required: true,
+        disabled: true,
       },
       {
         name: 'on_maintenance',
@@ -124,8 +133,7 @@ export class AddHost extends ModalAction {
   }
 
   onSubmit = (values) => {
-    const { segment_name, ...submitData } = values;
-    return this.store.create(this.item.uuid, { host: { ...submitData } });
+    return this.store.create(this.item.uuid, getHostCreateBody(values));
   };
 }
 

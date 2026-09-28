@@ -23,7 +23,7 @@ export class HostDetail extends Base {
   }
 
   get policy() {
-    return 'volume:get_all';
+    return 'os_masakari_api:os-hosts:index';
   }
 
   get name() {

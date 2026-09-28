@@ -27,7 +27,7 @@ export class Update extends ModalAction {
     return t('Update');
   }
 
-  static policy = 'baremetal:port:Update';
+  static policy = 'os_masakari_api:os-hosts:update';
 
   static allowed = () => Promise.resolve(true);
 

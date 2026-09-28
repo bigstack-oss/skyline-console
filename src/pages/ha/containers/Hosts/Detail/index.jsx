@@ -31,7 +31,7 @@ export class HostsDetail extends Base {
   }
 
   get policy() {
-    return 'capsule:get_one_all_projects';
+    return 'os_masakari_api:os-hosts:detail';
   }
 
   get actionConfigs() {

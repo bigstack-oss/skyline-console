@@ -20,6 +20,7 @@ import { QuestionCircleFilled } from '@ant-design/icons';
 import stylesConfirm from 'src/components/Confirm/index.less';
 import globalHostStore from 'src/stores/masakari/hosts';
 import Notify from 'src/components/Notify';
+import { getHostCreateBody } from 'resources/masakari/segment';
 import StepHost from './StepHost';
 import StepSegment from './StepSegment';
 
@@ -33,9 +34,16 @@ export class StepCreate extends StepAction {
   init() {
     this.store = globalHostStore;
     this.state = { btnIsLoading: false, ...this.state };
+    // Hosts already added to the created segment, so a retry after a
+    // partial failure only sends the ones that are still missing.
+    this.addedHosts = new Set();
+    this.failedHosts = [];
   }
 
-  static policy = 'get_images';
+  static policy = [
+    'os_masakari_api:segments:create',
+    'os_masakari_api:os-hosts:create',
+  ];
 
   static allowed() {
     return Promise.resolve(true);
@@ -43,6 +51,21 @@ export class StepCreate extends StepAction {
 
   get name() {
     return t('Create Segment');
+  }
+
+  get instanceName() {
+    const { segment_name } = this.values || {};
+    return segment_name;
+  }
+
+  get errorText() {
+    if (this.failedHosts.length) {
+      return t(
+        'Segment {name} was created, but these hosts could not be added: {hosts}. Confirm again to retry them, or cancel to delete the segment.',
+        { name: this.instanceName, hosts: this.failedHosts.join(', ') }
+      );
+    }
+    return super.errorText;
   }
 
   get listUrl() {
@@ -126,23 +149,41 @@ export class StepCreate extends StepAction {
     );
   }
 
-  prev() {
+  async prev() {
+    const { createdSegmentId } = this.state.extra || {};
+    if (createdSegmentId) {
+      try {
+        // Wait for the delete, otherwise creating the segment again under
+        // the same name races it and masakari rejects the duplicate.
+        await globalSegmentStore.delete({ id: createdSegmentId });
+      } catch (err) {
+        const { response: { data } = {} } = err || {};
+        Notify.errorWithDetail(
+          data,
+          t('Unable to {action}.', { action: t('delete segments') })
+        );
+        return;
+      }
+      this.addedHosts = new Set();
+      this.failedHosts = [];
+      this.setState({ extra: {} });
+    }
     this.currentRef.current.wrappedInstance.checkFormInput(
       this.updateDataOnPrev,
       this.updateDataOnPrev
     );
-    globalSegmentStore.delete({ id: this.state.extra.createdSegmentId });
   }
 
   onClickCancel = () => {
     if (this.state.current !== 0) {
       Modal.confirm({
-        title: 'Confirm',
+        title: t('Confirm'),
         icon: <QuestionCircleFilled className={stylesConfirm.warn} />,
-        content:
-          'Segment will be deleted. Are you sure want to cancel this created segment?',
-        okText: 'Confirm',
-        cancelText: 'Cancel',
+        content: t(
+          'The created segment will be deleted. Are you sure you want to cancel?'
+        ),
+        okText: t('Confirm'),
+        cancelText: t('Cancel'),
         loading: true,
         onOk: () => {
           return globalSegmentStore
@@ -162,26 +203,38 @@ export class StepCreate extends StepAction {
     ];
   }
 
-  onSubmit = (values) => {
-    const { name } = values;
-    return Promise.resolve(
-      name.selectedRows.forEach((item) => {
-        const {
-          binary,
-          forced_down,
-          host,
-          id,
-          state,
-          status,
-          updated_at,
-          zone,
-          ...hostData
-        } = item;
-        this.store.create(this.state.extra.createdSegmentId, {
-          host: { name: host, ...hostData },
-        });
-      })
+  onSubmit = async (values) => {
+    const { createdSegmentId } = this.state.extra;
+    const { selectedRows = [] } = values.name || {};
+    const pending = selectedRows.filter((it) => !this.addedHosts.has(it.host));
+    const results = await Promise.allSettled(
+      pending.map((it) =>
+        this.store.create(
+          createdSegmentId,
+          getHostCreateBody({ ...it, name: it.host })
+        )
+      )
     );
+
+    this.failedHosts = [];
+    results.forEach((result, index) => {
+      const { host } = pending[index];
+      if (result.status === 'fulfilled') {
+        this.addedHosts.add(host);
+        return;
+      }
+      this.failedHosts.push(host);
+      const { response: { data } = {} } = result.reason || {};
+      Notify.errorWithDetail(
+        data,
+        t('Unable to add host {name} to the segment.', { name: host })
+      );
+    });
+
+    if (this.failedHosts.length) {
+      throw new Error(this.errorText);
+    }
+    return results;
   };
 }
 

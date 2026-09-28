@@ -16,6 +16,7 @@ import Base from 'components/Form';
 import globalHostStore from 'src/stores/masakari/hosts';
 import globalComputeHostStore from 'src/stores/nova/compute-host';
 import { Input, Switch } from 'antd';
+import { hostControlAttributes, hostType } from 'resources/masakari/segment';
 
 export class StepHost extends Base {
   init() {
@@ -48,30 +49,19 @@ export class StepHost extends Base {
       binary: 'nova-compute',
     });
     const hostList = await globalHostStore.fetchList();
-    let flag = false;
+    const usedNames = new Set(hostList.map((it) => it.name));
+    // The payload is built from these row objects, so the fixed values have
+    // to live here rather than only as an input's defaultValue.
+    const host = response
+      .filter((it) => !usedNames.has(it.host))
+      .map((it) => ({
+        ...it,
+        type: hostType,
+        control_attributes: hostControlAttributes,
+      }));
 
-    if (hostList.length < 1) {
-      this.setState({
-        host: response,
-      });
-    } else {
-      response.forEach((newHost) => {
-        for (let i = 0; i < hostList.length; i++) {
-          if (hostList[i].name === newHost.host) {
-            flag = true;
-          }
-        }
-        if (!flag) {
-          this.setState({ host: [...this.state.host, newHost] });
-        }
-        flag = false;
-      });
-    }
-
-    const hostMap = Object.fromEntries(
-      this.state.host.map((host) => [host.id, host])
-    );
-    this.setState({ hostMap, hostLoading: false });
+    const hostMap = Object.fromEntries(host.map((it) => [it.id, it]));
+    this.setState({ host, hostMap, hostLoading: false });
   }
 
   get getHostName() {
@@ -113,38 +103,14 @@ export class StepHost extends Base {
         title: t('Type'),
         dataIndex: 'type',
         required: true,
-        render: (type, row) => (
-          <Input
-            required
-            defaultValue={type}
-            onChange={(e) => {
-              const { value } = e.target;
-              this.setState((prevState) => {
-                const host = prevState.hostMap;
-                host[row.id].type = value;
-                return { hostMap: host };
-              });
-            }}
-          />
-        ),
+        render: (type) => <Input value={type} disabled />,
       },
       {
         name: 'control_attributes',
         title: t('Control Attributes'),
         dataIndex: 'control_attributes',
-        render: (control_attribute, row) => (
-          <Input
-            defaultValue={control_attribute}
-            required
-            onChange={(e) => {
-              const { value } = e.target;
-              this.setState((prevState) => {
-                const host = prevState.hostMap;
-                host[row.id].control_attributes = value;
-                return { hostMap: host };
-              });
-            }}
-          />
+        render: (controlAttributes) => (
+          <Input value={controlAttributes} disabled />
         ),
       },
       {
