@@ -33,6 +33,9 @@ export class FlavorStore extends Base {
     const { extra_specs = {} } = record || {};
     const alias = extra_specs['pci_passthrough:alias'];
     const vgpu = extra_specs['resources:VGPU'];
+    // pGPU: the Cyborg device profile holds the GPU count, and Skyline has no
+    // Cyborg proxy, so only the profile name is known.
+    const deviceProfile = extra_specs['accel:device_profile'];
     const category = extra_specs[':category'];
     let gpuType = '-';
     let gpuCount = '-';
@@ -42,8 +45,12 @@ export class FlavorStore extends Base {
       gpuType = (vgpu || '').split(':')[0];
       gpuCount = (vgpu || '').split(':')[1];
     }
+    if (deviceProfile) {
+      gpuType = deviceProfile;
+    }
     if (alias) {
-      if (category && !category.includes('visualization_')) {
+      // A pGPU takes no alias entry, so every entry is a USB controller.
+      if (category && !category.includes('visualization_') && !deviceProfile) {
         const gpu = alias.split(',')[0];
         const usb = alias.split(',')[1];
         gpuType = gpu.split(':')[0];
