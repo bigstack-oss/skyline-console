@@ -37,7 +37,9 @@ describe('volume type pickers', () => {
   });
 
   it('never picks a hidden type, even as the cluster default', () => {
-    expect(getPreferredVolumeType(types, { id: 'placeholder' }).id).toBe('cube');
+    expect(getPreferredVolumeType(types, { id: 'placeholder' }).id).toBe(
+      'cube'
+    );
   });
 
   it('falls back to the first visible type', () => {
