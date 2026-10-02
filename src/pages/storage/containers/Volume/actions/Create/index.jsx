@@ -355,37 +355,33 @@ export class Create extends FormAction {
 
   onSnapshotChange = async (value) => {
     const { selectedRows = [] } = value || {};
-    let volumeTypeId = '';
+    if (!selectedRows.length) {
+      return;
+    }
+    const row = selectedRows[0] || {};
+    const { origin_data: { volume_type_id } = {}, id } = row;
+    const volumeId = row.volume_id || (row.origin_data || {}).volume_id;
     let volumeType = null;
-    if (selectedRows.length) {
-      const { origin_data: { volume_type_id } = {}, id } =
-        selectedRows[0] || {};
-      if (!volume_type_id) {
-        try {
-          const detail = await this.snapshotStore.fetchDetail({ id });
-          const {
-            volume: { volume_type },
-          } = detail || {};
-          volumeType = this.volumeTypes.find((it) => it.name === volume_type);
-          volumeTypeId = volumeType.id;
-        } catch (e) {
-          console.log('volume already not exist', e);
-        }
-      } else {
-        volumeTypeId = volume_type_id;
-        volumeType = this.volumeTypes.find((it) => it.id === volumeTypeId);
-      }
-      if (volumeType) {
-        const newValue = {
-          selectedRowKeys: [volumeTypeId],
-          selectedRows: [volumeType],
-          snapshotId: id,
-        };
-        this.setState({
-          initVolumeType: newValue,
-        });
+    if (volume_type_id) {
+      volumeType = this.volumeTypes.find((it) => it.id === volume_type_id);
+    } else if (volumeId) {
+      try {
+        const { volume: { volume_type } = {} } =
+          await this.snapshotStore.volumeClient.show(volumeId);
+        volumeType = this.volumeTypes.find((it) => it.name === volume_type);
+      } catch (e) {
+        console.log('volume already not exist', e);
       }
     }
+    // a hidden (__DEFAULT__) or unknown type stays unset: cinder then inherits the snapshot's type
+    const newValue = {
+      selectedRowKeys: volumeType ? [volumeType.id] : [],
+      selectedRows: volumeType ? [volumeType] : [],
+      snapshotId: id,
+    };
+    this.setState({ initVolumeType: newValue }, () => {
+      this.updateFormValue('volume_type', newValue);
+    });
   };
 
   get nameForStateUpdate() {
@@ -502,7 +498,7 @@ export class Create extends FormAction {
         ...volumeTypeSelectProps,
         data: this.volumeTypes,
         isLoading: this.volumeTypeStore.list.isLoading,
-        required: true,
+        required: !this.sourceTypeIsSnapshot,
         extra: this.getVolumeTypeExtra(),
         onChange: this.onVolumeTypeChange,
         initValue: initVolumeType,
@@ -610,8 +606,11 @@ export class Create extends FormAction {
       size,
       availability_zone: availableZone !== 'noSelect' ? availableZone : null,
       multiattach: shared,
-      volume_type: volume_type.selectedRowKeys[0],
     };
+    const { selectedRowKeys: volumeTypeKeys = [] } = volume_type || {};
+    if (volumeTypeKeys.length) {
+      volume.volume_type = volumeTypeKeys[0];
+    }
     if (
       backup &&
       Array.isArray(backup.selectedRowKeys) &&
