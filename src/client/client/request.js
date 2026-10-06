@@ -13,12 +13,10 @@
 // limitations under the License.
 
 import Axios from 'axios';
-import { getLocalStorageItem } from 'utils/local-storage';
+import { getValidKeystoneToken } from 'utils/keystone-token';
 import { isEmpty } from 'lodash';
 import qs from 'qs';
 import { v4 as uuidv4 } from 'uuid';
-import moment from 'moment';
-import cookie from 'utils/cookie';
 
 const METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'COPY'];
 /**
@@ -54,14 +52,8 @@ export class HttpRequest {
   }
 
   addToken(config) {
-    const keystoneToken = getLocalStorageItem('keystone_token') || '';
-    const timeExpiredStr = cookie('time_expired');
-    let tokenIsValid = false;
-    if (timeExpiredStr) {
-      const now = moment().valueOf();
-      tokenIsValid = now < timeExpiredStr * 1000;
-    }
-    if (keystoneToken && tokenIsValid) {
+    const keystoneToken = getValidKeystoneToken();
+    if (keystoneToken) {
       config.headers['X-Auth-Token'] = keystoneToken;
     }
   }

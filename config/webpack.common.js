@@ -17,11 +17,7 @@ const { normalize, resolve } = require('path');
 // const path = require("path");
 // const CleanWebpackPlugin = require('clean-webpack-plugin');
 const moment = require('moment');
-const {
-  getGlobalVariables,
-  getCustomStyleVariables,
-  getCosApiTokenCredentials,
-} = require('./utils');
+const { getGlobalVariables, getCustomStyleVariables } = require('./utils');
 
 const root = (path) => resolve(__dirname, `../${path}`);
 const version = moment().unix();
@@ -117,7 +113,6 @@ module.exports = {
   plugins: [
     new webpack.DefinePlugin({
       GLOBAL_VARIABLES: getGlobalVariables(),
-      COS_API_TOKEN_CREDENTIALS: getCosApiTokenCredentials(),
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
   ],
