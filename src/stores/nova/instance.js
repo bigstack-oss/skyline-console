@@ -109,6 +109,10 @@ export class ServerStore extends Base {
   async detailDidFetch(item, all_projects, filters) {
     const { id } = item;
     const { isRecycleBinDetail } = filters;
+    // Nova drops the `uuid` filter for callers without
+    // `servers:allow_all_filters` (non-admins), so the list can hold every
+    // server in the project. Pick this server by id, never the first row.
+    const findItem = (list) => (list || []).find((it) => it.id === id);
     try {
       if (!isRecycleBinDetail) {
         const result = await this.fetchList({
@@ -116,11 +120,11 @@ export class ServerStore extends Base {
           noReminder: true,
           all_projects,
         });
-        item.itemInList = result[0];
+        item.itemInList = findItem(result);
       } else {
         const store = new RecycleBinStore();
         const result = await store.fetchList({ uuid: id, all_projects });
-        item.itemInList = result[0];
+        item.itemInList = findItem(result);
       }
     } catch (e) {
       // eslint-disable-next-line no-console
