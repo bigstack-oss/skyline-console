@@ -125,8 +125,9 @@ export class CosVolumeStore extends BaseStore {
     const { id } = item;
     try {
       const result = await this.fetchList({ uuid: id, all_projects });
-      item.itemInList = result[0];
-      item.attachmentsContrib = result[0].attachments;
+      const itemInList = result.find((it) => it.id === id);
+      item.itemInList = itemInList;
+      item.attachmentsContrib = itemInList && itemInList.attachments;
     } catch (e) {}
     const { snapshot_id } = item;
     if (snapshot_id) {
