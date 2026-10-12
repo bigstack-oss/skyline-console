@@ -14,7 +14,7 @@
 
 import { action, observable } from 'mobx';
 import client from 'client';
-import Base from 'stores/base';
+import Base, { findInListById } from 'stores/base';
 import globalVolumeTypeStore from 'stores/cinder/volume-type';
 
 export class VolumeStore extends Base {
@@ -108,7 +108,7 @@ export class VolumeStore extends Base {
     const { id } = item;
     try {
       const result = await this.fetchList({ uuid: id, all_projects });
-      const itemInList = result.find((it) => it.id === id);
+      const itemInList = findInListById(result, id);
       item.itemInList = itemInList;
       item.attachmentsContrib = itemInList && itemInList.attachments;
     } catch (e) {}
