@@ -50,4 +50,11 @@ describe('PortStore detail, through the real request path', () => {
       { floating_ip_address: 'fip-of-10.0.0.10' },
     ]);
   });
+
+  it('binds by id even if the rows were not narrowed to the uuid', async () => {
+    mockHttp([]);
+    jest.spyOn(PortStore.prototype, 'fetchList').mockResolvedValue([B, A]);
+    const detail = await new PortStore().fetchDetail({ id: A.id });
+    expect(detail.itemInList.id).toBe(A.id);
+  });
 });

@@ -46,4 +46,12 @@ describe('VolumeStore detail, through the real request path', () => {
     expect(detail.itemInList).toBeUndefined();
     expect(detail.attachmentsContrib).toBeUndefined();
   });
+
+  it('binds by id even if the rows were not narrowed to the uuid', async () => {
+    mockHttp([]);
+    jest.spyOn(VolumeStore.prototype, 'fetchList').mockResolvedValue([B, A]);
+    const detail = await new VolumeStore().fetchDetail({ id: A.id });
+    expect(detail.itemInList.id).toBe(A.id);
+    expect(detail.attachmentsContrib).toEqual(A.attachments);
+  });
 });
