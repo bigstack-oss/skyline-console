@@ -14,7 +14,7 @@
 
 import { action, observable } from 'mobx';
 import client from 'client';
-import Base from 'stores/base';
+import Base, { findInListById } from 'stores/base';
 
 export class SnapshotStore extends Base {
   @observable
@@ -60,7 +60,8 @@ export class SnapshotStore extends Base {
       params.all_projects = true;
     }
     const { volume_snapshots = [] } = await this.listFetchByClient(params);
-    const { child_volumes = [], volume_name } = volume_snapshots[0] || {};
+    const { child_volumes = [], volume_name } =
+      findInListById(volume_snapshots, item.id) || {};
     return { ...item, child_volumes, volume_name };
   }
 
