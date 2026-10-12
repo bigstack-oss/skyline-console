@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import client from 'client';
-import Base from 'stores/base';
+import Base, { filterRowsByUuid } from 'stores/base';
 import { groupArray } from 'utils/index';
 import { updateVolume } from 'resources/cinder/volume';
 
@@ -67,8 +67,8 @@ export class InstanceVolumeStore extends Base {
       })
     );
     const resultVolumes = [];
-    results.forEach((result) => {
-      resultVolumes.push(...result.volumes);
+    results.forEach((result, index) => {
+      resultVolumes.push(...filterRowsByUuid(result.volumes, idArray[index]));
     });
     return resultVolumes;
   }
