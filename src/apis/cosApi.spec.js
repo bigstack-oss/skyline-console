@@ -21,6 +21,7 @@ const setSession = (token, expiredInSeconds) => {
 describe('cosApiClientV1', () => {
   beforeEach(() => {
     localStorage.clear();
+    document.cookie = 'time_expired=; expires=Thu, 01 Jan 1970 00:00:00 GMT';
     mockGoToLoginPage.mockClear();
   });
 
@@ -59,20 +60,29 @@ describe('cosApiClientV1', () => {
     expect(mockGoToLoginPage).not.toHaveBeenCalled();
   });
 
-  it('sends the user to the login page when the session expired', async () => {
+  it('sends the user to the login page when the session expired', () => {
     setSession('user-keystone-token', -60);
 
-    await expect(
+    expect(() =>
       requestInterceptor()({ url: '/datacenters/dc1/volumes', headers: {} })
-    ).rejects.toThrow();
+    ).toThrow();
     expect(mockGoToLoginPage).toHaveBeenCalled();
   });
 
-  it('sends the user to the login page on 401', async () => {
+  it('sends the user to the login page on 401 when the session expired', async () => {
+    setSession('user-keystone-token', -60);
     const error = { response: { status: 401 } };
 
     await expect(responseErrorInterceptor()(error)).rejects.toBe(error);
     expect(mockGoToLoginPage).toHaveBeenCalled();
+  });
+
+  it('keeps the user on the page on 401 when the session is valid', async () => {
+    setSession('user-keystone-token', 3600);
+    const error = { response: { status: 401 } };
+
+    await expect(responseErrorInterceptor()(error)).rejects.toBe(error);
+    expect(mockGoToLoginPage).not.toHaveBeenCalled();
   });
 
   it('keeps the user on the page for other errors', async () => {
