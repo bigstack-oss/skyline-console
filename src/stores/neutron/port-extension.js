@@ -18,7 +18,7 @@ import globalSecurityGroupStore from 'stores/neutron/security-group';
 import globalFloatingIpsStore from 'stores/neutron/floatingIp';
 import client from 'client';
 import List from 'stores/base-list';
-import Base from 'stores/base';
+import Base, { findInListById } from 'stores/base';
 import { isString } from 'lodash';
 
 export class PortStore extends Base {
@@ -149,15 +149,19 @@ export class PortStore extends Base {
 
   async detailDidFetch(item, all_projects) {
     const { id } = item;
-    let itemContrib = {};
+    let itemContrib;
     try {
       const result = await this.fetchList({ uuid: id, all_projects });
-      itemContrib = result[0];
+      itemContrib = findInListById(result, id);
     } catch (e) {}
+    // Not in the list: use the port's own show response, so the page still
+    // has this port's actions.
+    itemContrib = itemContrib || { ...item };
     itemContrib.associatedDetail = [];
-    if (item.fixed_ips.length !== 0) {
+    const { fixed_ips = [] } = itemContrib;
+    if (fixed_ips.length !== 0) {
       const details = await Promise.all(
-        itemContrib.fixed_ips.map((fixed_ip) =>
+        fixed_ips.map((fixed_ip) =>
           this.getItemFloatingIPs(fixed_ip.ip_address, id)
         )
       );
