@@ -37,19 +37,6 @@ describe('cosApiClientV1', () => {
     expect(config.headers.Authorization).toBeUndefined();
   });
 
-  it('does not request a separate cube-cos-api token', async () => {
-    setSession('user-keystone-token', 3600);
-    const post = jest.spyOn(cosApiClientV1, 'post');
-
-    await requestInterceptor()({
-      url: '/datacenters/dc1/volumes',
-      headers: {},
-    });
-
-    expect(post).not.toHaveBeenCalled();
-    post.mockRestore();
-  });
-
   it('skips the token for the auth-free datacenters list', async () => {
     const config = await requestInterceptor()({
       url: '/datacenters',

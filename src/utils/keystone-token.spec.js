@@ -8,6 +8,7 @@ const expireIn = (seconds) =>
 describe('getValidKeystoneToken', () => {
   beforeEach(() => {
     localStorage.clear();
+    document.cookie = 'time_expired=; expires=Thu, 01 Jan 1970 00:00:00 GMT';
   });
 
   it('returns the token while the session is valid', () => {
@@ -19,6 +20,12 @@ describe('getValidKeystoneToken', () => {
   it('returns empty after the session expired', () => {
     setLocalStorageItem('keystone_token', 'abc');
     expireIn(-60);
+    expect(getValidKeystoneToken()).toBe('');
+  });
+
+  it('returns empty when the expiry cookie is malformed', () => {
+    setLocalStorageItem('keystone_token', 'abc');
+    cookie('time_expired', 'not-a-number');
     expect(getValidKeystoneToken()).toBe('');
   });
 

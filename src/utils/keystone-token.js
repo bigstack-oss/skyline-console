@@ -1,4 +1,3 @@
-import moment from 'moment';
 import { getLocalStorageItem } from 'utils/local-storage';
 import cookie from 'utils/cookie';
 
@@ -12,6 +11,7 @@ export const getValidKeystoneToken = () => {
   if (!keystoneToken || !timeExpiredStr) {
     return '';
   }
-  const tokenIsValid = moment().valueOf() < timeExpiredStr * 1000;
+  // A malformed cookie becomes NaN and counts as expired.
+  const tokenIsValid = Date.now() < Number(timeExpiredStr) * 1000;
   return tokenIsValid ? keystoneToken : '';
 };
