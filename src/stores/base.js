@@ -19,6 +19,19 @@ import List from 'stores/base-list';
 import globalProjectMapStore from 'stores/project';
 import globalRootStore from 'stores/root';
 
+// A `uuid` list filter is not honoured for every caller (nova drops it for
+// non-admins), so never trust the API to have applied it.
+export const filterRowsByUuid = (rows, uuid) => {
+  if (uuid === undefined || uuid === null || uuid === '') {
+    return rows;
+  }
+  const ids = [].concat(uuid);
+  return rows.filter((it) => !!it && ids.includes(it.id));
+};
+
+export const findInListById = (list, id) =>
+  (list || []).find((it) => !!it && it.id === id);
+
 export default class BaseStore {
   list = new List();
 
@@ -309,12 +322,15 @@ export default class BaseStore {
         hasNext = false;
       }
     }
-    return data;
+    return filterRowsByUuid(data, get(params, 'uuid'));
   }
 
   async requestListAll(params, originParams) {
     const result = await this.listFetchByClient(params, originParams);
-    return this.getListDataFromResult(result);
+    return filterRowsByUuid(
+      this.getListDataFromResult(result),
+      get(params, 'uuid')
+    );
   }
 
   async requestList(params, originParams) {
