@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Base from 'stores/base';
+import Base, { filterRowsByUuid } from 'stores/base';
 import { groupArray } from 'utils/index';
 import { updateVolume } from 'resources/cinder/volume';
 
@@ -35,8 +35,8 @@ export class SnapshotVolumeStore extends Base {
       })
     );
     const resultVolumes = [];
-    results.forEach((result) => {
-      resultVolumes.push(...result.volumes);
+    results.forEach((result, index) => {
+      resultVolumes.push(...filterRowsByUuid(result.volumes, idArray[index]));
     });
     return resultVolumes;
   }
