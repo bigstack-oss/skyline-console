@@ -15,9 +15,44 @@
 import { action, observable } from 'mobx';
 import { get } from 'lodash';
 import client from 'client';
-import Base from 'stores/base';
+import Base, { findInListById } from 'stores/base';
 import { mapperRule } from 'resources/neutron/security-group-rule';
 import { RecycleBinStore } from '../skyline/recycle-server';
+
+// The row the skyline API's /extension/servers returns, built from a
+// nova show response (its wrapper/skyline.py Server).
+export const serverRowFromShow = (server) => {
+  const addresses = [].concat(...Object.values(server.addresses || {}));
+  const addressesOfType = (type) =>
+    addresses
+      .filter((it) => it['OS-EXT-IPS:type'] === type)
+      .map((it) => it.addr);
+  const { image, flavor } = server;
+  return {
+    id: server.id,
+    name: server.name,
+    project_id: server.tenant_id,
+    host: server['OS-EXT-SRV-ATTR:host'],
+    hostname: server['OS-EXT-SRV-ATTR:hostname'],
+    image: (image && image.id) || null,
+    fixed_addresses: addressesOfType('fixed'),
+    floating_addresses: addressesOfType('floating'),
+    flavor: (flavor && flavor.original_name) || null,
+    flavor_info: flavor,
+    status: server.status,
+    locked: server.locked,
+    created_at: server.created,
+    updated_at: server.updated,
+    task_state: server['OS-EXT-STS:task_state'],
+    vm_state: server['OS-EXT-STS:vm_state'],
+    power_state: server['OS-EXT-STS:power_state'],
+    volumes_attached: server['os-extended-volumes:volumes_attached'] || [],
+    root_device_name: server['OS-EXT-SRV-ATTR:root_device_name'],
+    metadata: server.metadata,
+    tags: server.tags || [],
+    origin_data: { ...server },
+  };
+};
 
 export class ServerStore extends Base {
   @observable
@@ -109,26 +144,25 @@ export class ServerStore extends Base {
   async detailDidFetch(item, all_projects, filters) {
     const { id } = item;
     const { isRecycleBinDetail } = filters;
-    // Nova drops the `uuid` filter for callers without
-    // `servers:allow_all_filters` (non-admins), so the list can hold every
-    // server in the project. Pick this server by id, never the first row.
-    const findItem = (list) => (list || []).find((it) => it.id === id);
+    const store = isRecycleBinDetail ? new RecycleBinStore() : this;
     try {
-      if (!isRecycleBinDetail) {
-        const result = await this.fetchList({
-          uuid: id,
-          noReminder: true,
-          all_projects,
-        });
-        item.itemInList = findItem(result);
-      } else {
-        const store = new RecycleBinStore();
-        const result = await store.fetchList({ uuid: id, all_projects });
-        item.itemInList = findItem(result);
+      // pureFetchList leaves the store's list alone, and its rows are
+      // already narrowed to `uuid` (see filterRowsByUuid).
+      const rows = await store.pureFetchList({ uuid: id, all_projects });
+      const row = findInListById(rows, id);
+      if (row) {
+        const [listed] = await store.listDidFetch([row], all_projects, {});
+        item.itemInList = store.mapper(listed, all_projects, {});
       }
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log(e);
+    }
+    if (!item.itemInList) {
+      // Not in the list (e.g. older than nova's max_limit): build the row
+      // from this server's own show response so its actions stay bound
+      // to it.
+      item.itemInList = this.mapper(serverRowFromShow(item));
     }
     return item;
   }
