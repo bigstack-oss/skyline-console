@@ -111,4 +111,14 @@ describe('ServerStore detail, through the real request path', () => {
     expect(listDidFetch).toHaveBeenCalledTimes(1);
     expect(listDidFetch.mock.calls[0][0].map((it) => it.id)).toEqual([A.id]);
   });
+
+  it('binds by id even if the rows were not narrowed to the uuid', async () => {
+    mockHttp();
+    jest
+      .spyOn(ServerStore.prototype, 'pureFetchList')
+      .mockResolvedValue([row(B.id, B.name), row(A.id, A.name)]);
+    const detail = await new ServerStore().fetchDetail({ id: A.id });
+    expect(detail.itemInList.id).toBe(A.id);
+    expect(detail.itemInList.name).toBe(A.name);
+  });
 });
