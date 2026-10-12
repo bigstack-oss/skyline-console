@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import { groupArray } from 'utils/index';
-import Base from 'stores/base';
+import Base, { filterRowsByUuid } from 'stores/base';
 
 export class ServerGroupInstanceStore extends Base {
   get listResponseKey() {
@@ -44,8 +44,11 @@ export class ServerGroupInstanceStore extends Base {
       })
     );
     const servers = [];
-    results.forEach((result) => {
-      servers.push(...result[this.listResponseKey]);
+    results.forEach((result, index) => {
+      // Nova ignores `uuid` for non-admins and returns the whole project.
+      servers.push(
+        ...filterRowsByUuid(result[this.listResponseKey], memberArrs[index])
+      );
     });
     return servers;
   }
