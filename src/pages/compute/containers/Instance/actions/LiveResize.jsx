@@ -224,6 +224,12 @@ export class LiveResize extends ModalAction {
     if (!this.isBfv && curDisk !== undefined && disk !== curDisk) {
       return t('Root disk size must not change');
     }
+    // nova rejects any ephemeral change on the live path, boot-from-volume too
+    const curEphemeral = current.ephemeral;
+    const ephemeral = (flavor || {})['OS-FLV-EXT-DATA:ephemeral'] || 0;
+    if (curEphemeral !== undefined && ephemeral !== curEphemeral) {
+      return t('Ephemeral disk size must not change');
+    }
     if (vcpus > curVcpus && vcpus > maxVcpus) {
       return t('Above the hotplug ceiling of {max} vCPU', { max: maxVcpus });
     }

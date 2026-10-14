@@ -983,6 +983,7 @@
   "Environment Variable": "Переменная окружения",
   "Environment Variables": "Переменные окружения",
   "Ephemeral Disk (GiB)": "Эфемерный диск (ГБ)",
+  "Ephemeral disk size must not change": "Размер эфемерного диска не должен меняться",
   "Equatorial Guinea": "Экваториальная Гвинея",
   "Eritrea": "Эритрея",
   "Error": "Ошибка",
