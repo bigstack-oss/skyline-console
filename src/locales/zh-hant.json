@@ -986,6 +986,7 @@
   "Environment Variable": "環境變數",
   "Environment Variables": "環境變數",
   "Ephemeral Disk (GiB)": "暫時磁碟 (GiB)",
+  "Ephemeral disk size must not change": "暫時磁碟大小不得變更",
   "Equatorial Guinea": "赤道幾內亞",
   "Eritrea": "厄利垂亞",
   "Error": "錯誤",

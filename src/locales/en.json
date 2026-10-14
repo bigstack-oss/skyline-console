@@ -986,6 +986,7 @@
   "Environment Variable": "Environment Variable",
   "Environment Variables": "Environment Variables",
   "Ephemeral Disk (GiB)": "Ephemeral Disk (GiB)",
+  "Ephemeral disk size must not change": "Ephemeral disk size must not change",
   "Equatorial Guinea": "Equatorial Guinea",
   "Eritrea": "Eritrea",
   "Error": "Error",

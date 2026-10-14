@@ -986,6 +986,7 @@
   "Environment Variable": "环境变量",
   "Environment Variables": "环境变量",
   "Ephemeral Disk (GiB)": "本地临时卷 (GiB)",
+  "Ephemeral disk size must not change": "本地临时卷大小不能变更",
   "Equatorial Guinea": "赤道几内亚",
   "Eritrea": "厄立特里亚国",
   "Error": "错误",
