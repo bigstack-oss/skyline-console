@@ -219,10 +219,15 @@ export class LiveResize extends ModalAction {
     if (vcpus < curVcpus || ram < curRam) {
       return t('Live resize is grow-only');
     }
-    // boot-from-volume roots come from the volume, so the flavor's root_gb is
-    // ignored -- the API skips this check for them too
-    if (!this.isBfv && curDisk !== undefined && disk !== curDisk) {
-      return t('Root disk size must not change');
+    // an image-backed root grows live; boot-from-volume ignores root_gb
+    if (!this.isBfv && curDisk !== undefined && disk < curDisk) {
+      return t('Root disk size cannot shrink');
+    }
+    // nova rejects any ephemeral change on the live path, boot-from-volume too
+    const curEphemeral = current.ephemeral;
+    const ephemeral = (flavor || {})['OS-FLV-EXT-DATA:ephemeral'] || 0;
+    if (curEphemeral !== undefined && ephemeral !== curEphemeral) {
+      return t('Ephemeral disk size must not change');
     }
     if (vcpus > curVcpus && vcpus > maxVcpus) {
       return t('Above the hotplug ceiling of {max} vCPU', { max: maxVcpus });
