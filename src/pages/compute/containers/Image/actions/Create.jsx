@@ -98,6 +98,8 @@ export class CreateForm extends FormAction {
     if (defaultDestination) {
       this.updateFormValue('destination', defaultDestination);
     }
+    // The form's initial values were read before the materials arrived
+    this.updateFormValue('visibility', this.defaultVisibility);
   }
 
   get projects() {
@@ -107,7 +109,9 @@ export class CreateForm extends FormAction {
   get defaultValue() {
     return {
       destination: this.defaultDestination,
-      visibility: this.state.sourceFromAnotherHypervisor ? undefined : 'public',
+      visibility: this.state.sourceFromAnotherHypervisor
+        ? undefined
+        : this.defaultVisibility,
     };
   }
 
@@ -156,6 +160,12 @@ export class CreateForm extends FormAction {
     return destinations.find((dest) => dest.isDefault)?.name;
   }
 
+  // The backend offers only the visibility values the caller may use, so a
+  // non-admin may get private alone.
+  get defaultVisibility() {
+    return this.store.imageMaterials?.visibilities?.[0];
+  }
+
   get isImageMaterialsLoading() {
     return this.store.isImageMaterialsLoading;
   }
@@ -179,7 +189,7 @@ export class CreateForm extends FormAction {
       destination: this.defaultDestination,
       domain: undefined,
       source: false,
-      visibility: 'public',
+      visibility: this.defaultVisibility,
     });
   };
 
