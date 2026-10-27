@@ -98,8 +98,17 @@ export class CreateForm extends FormAction {
     if (defaultDestination) {
       this.updateFormValue('destination', defaultDestination);
     }
-    // The form's initial values were read before the materials arrived
-    this.updateFormValue('visibility', this.defaultVisibility);
+    // The form's initial values were read before the materials arrived, or
+    // from the materials of an earlier visit. Keep a value the user or a
+    // reserved image set meanwhile, as long as it is still offered.
+    const { visibilities = [] } = this.store.imageMaterials || {};
+    const visibility = this.formRef.current?.getFieldValue('visibility');
+    if (
+      !this.state.sourceFromAnotherHypervisor &&
+      !visibilities.includes(visibility)
+    ) {
+      this.updateFormValue('visibility', this.defaultVisibility);
+    }
   }
 
   get projects() {
