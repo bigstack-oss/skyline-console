@@ -34,15 +34,20 @@ export default class TabSelectTable extends Component {
 
   componentDidUpdate(prevProps) {
     const { value = {}, tabs = [], defaultTab } = this.props;
-    if (isEqual(prevProps.value, value) && isEqual(prevProps.tabs, tabs)) {
+    const { tabKey, selectedRowKeys, selectedRows } = this.state;
+    // Callers may rebuild `tabs` (with new column closures) on every render,
+    // so compare tab keys only, not the whole tab objects.
+    const tabKeys = tabs.map((it) => it.key);
+    const prevTabKeys = (prevProps.tabs || []).map((it) => it.key);
+    if (isEqual(prevProps.value, value) && isEqual(prevTabKeys, tabKeys)) {
       return;
     }
+    const currentTab = tabKeys.includes(tabKey) ? tabKey : undefined;
     const nextState = {
-      tabKey: value.tab || defaultTab || (tabs[0] && tabs[0].key),
+      tabKey: value.tab || currentTab || defaultTab || tabKeys[0],
       selectedRowKeys: value.selectedRowKeys || [],
       selectedRows: value.selectedRows || [],
     };
-    const { tabKey, selectedRowKeys, selectedRows } = this.state;
     if (
       tabKey === nextState.tabKey &&
       isEqual(selectedRowKeys, nextState.selectedRowKeys) &&
@@ -62,7 +67,9 @@ export default class TabSelectTable extends Component {
 
   onChangeValue = () => {
     const { onChange } = this.props;
-    onChange && onChange(this.state);
+    const { tabKey, selectedRowKeys, selectedRows } = this.state;
+    // Emit `tab`, the same field the constructor and componentDidUpdate read.
+    onChange && onChange({ tab: tabKey, selectedRowKeys, selectedRows });
   };
 
   getMultiSelected = (keys, rows, data) => {
