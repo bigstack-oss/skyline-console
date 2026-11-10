@@ -38,6 +38,8 @@ export class NetworkStep extends Base {
     this.networkStore = new NetworkStore();
     this.subnetStore = new SubnetStore();
     this.securityGroupStore = new SecurityGroupStore();
+    // Separate from securityGroupStore, which only holds the table's current page.
+    this.defaultSecurityGroupStore = new SecurityGroupStore();
     this.portStore = new PortStore();
     this.subnetMap = {};
     this.state.networkSelectRows = this.props.context?.networkSelectRows || [];
@@ -64,6 +66,36 @@ export class NetworkStep extends Base {
   }
 
   allowed = () => Promise.resolve();
+
+  componentDidMount() {
+    super.componentDidMount();
+    this.fetchDefaultSecurityGroup();
+  }
+
+  // Look up the project's default security group once. The table pages
+  // through securityGroupStore, so deriving the default from its data made
+  // initValue change on every page and reset the user's selection.
+  async fetchDefaultSecurityGroup() {
+    try {
+      const groups = await this.defaultSecurityGroupStore.fetchList({
+        name: 'default',
+        project_id: this.currentProjectId,
+      });
+      const group = (groups || []).find((it) => it.name === 'default');
+      if (!group) {
+        return;
+      }
+      this.setState({
+        defaultSecurityGroupInitValue: {
+          selectedRowKeys: [group.id],
+          selectedRows: [group],
+        },
+      });
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log(e);
+    }
+  }
 
   getSubnetPromise = async (networkId) => {
     if (!this.subnetMap[networkId]) {
@@ -213,15 +245,11 @@ export class NetworkStep extends Base {
       subnets,
       initValue = [],
       ports = [],
+      defaultSecurityGroupInitValue,
     } = this.state;
     const showNetworks = networkSelectRows.length > 0;
     const networkRequired = ports.length === 0;
     const portRequired = networkSelectRows.length === 0;
-
-    const securityGroupDefaultSelectedRowKey =
-      this.securityGroupStore?.list?.data?.find(
-        (item) => item.name?.toLowerCase() === 'default'
-      )?.id;
 
     return [
       {
@@ -328,10 +356,9 @@ export class NetworkStep extends Base {
         ),
         filterParams: securityGroupFilter,
         columns: securityGroupColumns,
-        initValue:
-          this.showSecurityGroups && securityGroupDefaultSelectedRowKey
-            ? { selectedRowKeys: [securityGroupDefaultSelectedRowKey] }
-            : undefined,
+        initValue: this.showSecurityGroups
+          ? defaultSecurityGroupInitValue
+          : undefined,
       },
     ];
   }
